@@ -1,0 +1,327 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useCart } from '@/context/CartContext';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  User,
+  ShoppingBag,
+  ChevronDown,
+  Menu,
+  X,
+  Check
+} from 'lucide-react';
+
+const ANNOUNCEMENTS = [
+  { text: 'Send To Us On Telegram', link: 'https://t.me' },
+  { text: 'Worldwide Discreet Shipping Available', link: '/shop' },
+  { text: 'Authentic Genetics & Streetwear Drops Live', link: '/shop' },
+];
+
+const CURRENCIES = [
+  { code: 'EUR', symbol: '€', label: 'EUR €' },
+  { code: 'USD', symbol: '$', label: 'USD $' },
+  { code: 'GBP', symbol: '£', label: 'GBP £' },
+  { code: 'CAD', symbol: '$', label: 'CAD $' },
+];
+
+export function Navbar() {
+  const { totalItems, openCart } = useCart();
+
+  // Announcement ticker state
+  const [announcementIdx, setAnnouncementIdx] = useState(0);
+
+  // Currency dropdown state
+  const [currency, setCurrency] = useState('EUR');
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+
+  // Search overlay state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Mobile drawer state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Next / Prev announcement handlers
+  const handlePrevAnnouncement = () => {
+    setAnnouncementIdx((prev) => (prev - 1 + ANNOUNCEMENTS.length) % ANNOUNCEMENTS.length);
+  };
+
+  const handleNextAnnouncement = () => {
+    setAnnouncementIdx((prev) => (prev + 1) % ANNOUNCEMENTS.length);
+  };
+
+  return (
+    <>
+      <header className="fixed top-0 left-0 right-0 z-40 w-full shadow-lg">
+        {/* ======================================================== */}
+        {/* TOP ANNOUNCEMENT BAR (Dark Plum / Purple)              */}
+        {/* ======================================================== */}
+        <div className="bg-[#260940] border-b border-white/10 text-white text-xs py-2 px-4">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            {/* Left Chevron */}
+            <button
+              onClick={handlePrevAnnouncement}
+              className="p-1 text-white/70 hover:text-white transition"
+              aria-label="Previous announcement"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Announcement Text */}
+            <div className="flex-1 text-center font-normal tracking-wide text-[13px] px-2">
+              <a
+                href={ANNOUNCEMENTS[announcementIdx].link}
+                target={ANNOUNCEMENTS[announcementIdx].link.startsWith('http') ? '_blank' : '_self'}
+                rel="noopener noreferrer"
+                className="hover:underline transition inline-block text-white"
+              >
+                {ANNOUNCEMENTS[announcementIdx].text}
+              </a>
+            </div>
+
+            {/* Right Chevron */}
+            <button
+              onClick={handleNextAnnouncement}
+              className="p-1 text-white/70 hover:text-white transition"
+              aria-label="Next announcement"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* MAIN NAVIGATION BAR (Deep Royal Purple #360e5b)        */}
+        {/* ======================================================== */}
+        <div className="bg-[#360e5b] text-white py-3.5 px-4 sm:px-8 transition-colors">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            {/* LEFT: Mobile Menu Button + Logo + Navigation Links */}
+            <div className="flex items-center gap-6 sm:gap-8">
+              {/* Mobile Hamburger Toggle (hidden on desktop) */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="md:hidden text-white/90 hover:text-white p-1"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+
+              {/* Wizard Trees Brand Logo (Cursive Script) */}
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="relative flex items-center justify-center">
+                  {/* Stylized Script Wizard Trees Mark matching the image */}
+                  <span className="font-serif italic font-extrabold text-2xl sm:text-[26px] tracking-tight text-white select-none drop-shadow-md">
+                    Wizard <span className="font-normal font-serif not-italic text-purple-200">Trees</span>
+                  </span>
+                </div>
+              </Link>
+
+              {/* Desktop Links: Home, Catalog, Contact */}
+              <nav className="hidden md:flex items-center gap-7 text-[15px] font-normal tracking-wide text-white">
+                <Link
+                  href="/"
+                  className="hover:text-purple-200 transition-colors duration-150"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/shop"
+                  className="hover:text-purple-200 transition-colors duration-150"
+                >
+                  Catalog
+                </Link>
+                <Link
+                  href="/about"
+                  className="hover:text-purple-200 transition-colors duration-150"
+                >
+                  Contact
+                </Link>
+              </nav>
+            </div>
+
+            {/* RIGHT: Currency Dropdown + Search + Account + Shopping Bag */}
+            <div className="flex items-center gap-5 sm:gap-6 text-white">
+              {/* Currency Selector (EUR ⌵) */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsCurrencyOpen(!isCurrencyOpen)}
+                  className="flex items-center gap-1 text-[13px] font-medium text-white hover:text-purple-200 transition-colors select-none py-1"
+                  aria-label="Currency selector"
+                >
+                  <span>{currency}</span>
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isCurrencyOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isCurrencyOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-30"
+                      onClick={() => setIsCurrencyOpen(false)}
+                    />
+                    <div className="absolute right-0 mt-2 w-32 rounded-lg bg-[#260940] border border-white/10 shadow-2xl py-1.5 z-40 animate-fade-in text-xs">
+                      {CURRENCIES.map((c) => (
+                        <button
+                          key={c.code}
+                          onClick={() => {
+                            setCurrency(c.code);
+                            setIsCurrencyOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 text-left hover:bg-white/10 transition ${currency === c.code ? 'text-white font-bold' : 'text-white/70'
+                            }`}
+                        >
+                          <span>{c.label}</span>
+                          {currency === c.code && <Check className="w-3.5 h-3.5 text-purple-300" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Search Icon */}
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="text-white hover:text-purple-200 transition-colors p-1"
+                aria-label="Search"
+              >
+                <Search className="w-5 h-5 stroke-[1.8]" />
+              </button>
+
+              {/* User Account Icon */}
+              <Link
+                href="/about"
+                className="text-white hover:text-purple-200 transition-colors p-1"
+                aria-label="Account"
+              >
+                <User className="w-5 h-5 stroke-[1.8]" />
+              </Link>
+
+              {/* Shopping Bag Icon with Cart Count */}
+              <button
+                onClick={openCart}
+                className="relative text-white hover:text-purple-200 transition-colors p-1"
+                aria-label="View bag"
+              >
+                <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#360e5b]">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* EXPANDABLE SEARCH OVERLAY                                 */}
+        {/* ======================================================== */}
+        {isSearchOpen && (
+          <div className="bg-[#2a0b47] border-b border-white/10 py-4 px-4 sm:px-8 text-white animate-fade-in">
+            <div className="max-w-3xl mx-auto flex items-center gap-3">
+              <Search className="w-5 h-5 text-white/50" />
+              <input
+                type="text"
+                autoFocus
+                placeholder="Search products, strains, merchandise..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    window.location.href = `/shop?q=${encodeURIComponent(searchQuery)}`;
+                  }
+                }}
+                className="w-full bg-transparent border-none text-sm text-white placeholder-white/40 focus:outline-none"
+              />
+              <button
+                onClick={() => setIsSearchOpen(false)}
+                className="text-white/60 hover:text-white p-1"
+                aria-label="Close search"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* ======================================================== */}
+      {/* MOBILE DRAWER MENU                                       */}
+      {/* ======================================================== */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+          />
+
+          {/* Drawer Panel */}
+          <div className="relative w-4/5 max-w-xs bg-[#360e5b] text-white p-6 shadow-2xl flex flex-col justify-between z-10">
+            <div>
+              {/* Header with Close Button */}
+              <div className="flex items-center justify-between pb-6 border-b border-white/10">
+                <span className="font-serif italic font-bold text-xl text-white">
+                  Wizard Trees
+                </span>
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1 text-white/70 hover:text-white"
+                  aria-label="Close mobile menu"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Links */}
+              <nav className="mt-8 flex flex-col space-y-5 text-lg font-medium">
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-purple-200 transition"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/shop"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-purple-200 transition"
+                >
+                  Catalog
+                </Link>
+                <Link
+                  href="/about"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-purple-200 transition"
+                >
+                  Contact
+                </Link>
+              </nav>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-6 border-t border-white/10 space-y-4 text-sm">
+              <div className="flex items-center justify-between text-white/70">
+                <span>Currency</span>
+                <span className="text-white font-bold">{currency}</span>
+              </div>
+              <a
+                href="https://t.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center rounded-lg bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"
+              >
+                Send To Us On Telegram
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
