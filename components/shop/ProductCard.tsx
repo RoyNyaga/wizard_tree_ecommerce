@@ -18,11 +18,15 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
     e.stopPropagation();
     const defaultWeight = product.weights?.[0];
     const defaultSize = product.sizes?.[0];
-    addToCart(product, {
-      weight: defaultWeight,
-      size: defaultSize,
-      quantity: 1,
-    });
+    addToCart(
+      product,
+      {
+        weight: defaultWeight,
+        size: defaultSize,
+        quantity: 1,
+      },
+      { x: e.clientX, y: e.clientY }
+    );
   };
 
   return (

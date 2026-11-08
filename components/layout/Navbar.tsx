@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import {
   ChevronLeft,
@@ -29,7 +31,13 @@ const CURRENCIES = [
 ];
 
 export function Navbar() {
-  const { totalItems, openCart } = useCart();
+  const pathname = usePathname();
+  const { totalItems, openCart, isCartBumping } = useCart();
+
+  // Hide storefront navbar on admin dashboard pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   // Announcement ticker state
   const [announcementIdx, setAnnouncementIdx] = useState(0);
@@ -202,18 +210,26 @@ export function Navbar() {
               </Link>
 
               {/* Shopping Bag Icon with Cart Count */}
-              <button
+              <motion.button
+                id="navbar-cart-btn"
                 onClick={openCart}
+                animate={isCartBumping ? { scale: [1, 1.25, 0.95, 1], rotate: [0, -8, 8, 0] } : { scale: 1 }}
+                transition={{ duration: 0.4 }}
                 className="relative text-white hover:text-purple-200 transition-colors p-1"
                 aria-label="View bag"
               >
                 <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#360e5b]">
+                  <motion.span
+                    key={totalItems}
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#360e5b]"
+                  >
                     {totalItems}
-                  </span>
+                  </motion.span>
                 )}
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>

@@ -1,12 +1,35 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { Product, ProductCategory } from '@/types';
 import { PRODUCTS_DATA } from '@/lib/mockData';
+import { fetchCompanyProducts, DbProduct } from '@/lib/supabase/products';
+import { fetchCompanyCategories, DbProductCategory } from '@/lib/supabase/categories';
 import { ProductCard } from '@/components/shop/ProductCard';
 import { ProductModal } from '@/components/shop/ProductModal';
-import { ShoppingBag, Search, Sparkles, Filter, SlidersHorizontal } from 'lucide-react';
+import { ShoppingBag, Search, Sparkles, Database } from 'lucide-react';
+
+function mapDbProductToProduct(db: DbProduct): Product {
+  const catSlug = db.category_data?.slug || db.category || 'flower';
+  const catName = db.category_data?.name || db.category.toUpperCase();
+
+  return {
+    id: db.id,
+    slug: db.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
+    name: db.name,
+    subtitle: `${catName} // LA CRAFT`,
+    category: (catSlug as ProductCategory) || 'flower',
+    price: Number(db.price),
+    image: db.images?.[0] || '/images/products/rs11-jar.jpg',
+    galleryImages: db.images || [],
+    description: db.description || 'Artisanal cultivar from Wizard Trees Los Angeles cleanroom facilities.',
+    stockStatus: db.quantity <= 0 ? 'sold_out' : db.quantity <= 5 ? 'low_stock' : 'in_stock',
+    badge: 'LIVE DROP',
+    createdAt: db.created_at,
+  };
+}
 
 function ShopContent() {
   const searchParams = useSearchParams();
@@ -24,16 +47,48 @@ function ShopContent() {
     }
   }, [searchParams]);
 
-  const categories = [
-    { id: 'all', label: 'All Catalog' },
-    { id: 'flower', label: 'Flower Jars' },
-    { id: 'preroll', label: 'Hash Holes & Cones' },
-    { id: 'seeds', label: 'Breeder Seeds' },
-    { id: 'streetwear', label: 'Streetwear & Merch' },
-    { id: 'accessories', label: 'Accessories' },
-  ];
+  // Fetch live categories
+  const { data: dbCategories = [] } = useQuery({
+    queryKey: ['public_categories'],
+    queryFn: fetchCompanyCategories,
+  });
 
-  const filteredProducts = PRODUCTS_DATA.filter((product) => {
+  // Fetch live products from Supabase with React Query caching
+  const { data: dbProducts = [], isLoading: isSupabaseLoading } = useQuery({
+    queryKey: ['public_products'],
+    queryFn: () => fetchCompanyProducts({ status: 'published' }),
+  });
+
+  // Combine live Supabase products with catalog items
+  const allProducts = useMemo(() => {
+    const liveItems: Product[] = dbProducts.map(mapDbProductToProduct);
+    if (liveItems.length > 0) {
+      return [...liveItems, ...PRODUCTS_DATA];
+    }
+    return PRODUCTS_DATA;
+  }, [dbProducts]);
+
+  // Combine categories dynamically
+  const categoriesList = useMemo(() => {
+    const base = [{ id: 'all', label: 'All Catalog' }];
+    if (dbCategories.length > 0) {
+      dbCategories.forEach((cat) => {
+        base.push({ id: cat.slug, label: cat.name });
+      });
+      return base;
+    }
+    // Fallback standard tabs
+    return [
+      { id: 'all', label: 'All Catalog' },
+      { id: 'flower', label: 'Flower Jars' },
+      { id: 'preroll', label: 'Hash Holes & Cones' },
+      { id: 'seeds', label: 'Breeder Seeds' },
+      { id: 'streetwear', label: 'Streetwear & Merch' },
+      { id: 'other', label: 'Other Items' },
+    ];
+  }, [dbCategories]);
+
+  const filteredProducts = allProducts.filter((product) => {
     const matchesCategory =
       activeCategory === 'all' || product.category === activeCategory;
 
@@ -51,7 +106,7 @@ function ShopContent() {
   }).sort((a, b) => {
     if (sortBy === 'price-low') return a.price - b.price;
     if (sortBy === 'price-high') return b.price - a.price;
-    return 0; // 'featured' retains mock ordering
+    return 0; // 'featured' retains natural ordering
   });
 
   return (
@@ -59,11 +114,20 @@ function ShopContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="border-b border-white/10 pb-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/20 px-3.5 py-1 mb-4">
-            <Sparkles className="w-3.5 h-3.5 text-wizard-purple-glow" />
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-purple-200">
-              03 // COMPLETE CATALOG
-            </span>
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-950/20 px-3.5 py-1">
+              <Sparkles className="w-3.5 h-3.5 text-wizard-purple-glow" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-purple-200">
+                03 // COMPLETE CATALOG
+              </span>
+            </div>
+
+            {dbProducts.length > 0 && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-950/20 px-3 py-1 font-mono text-[10px] font-bold text-emerald-400">
+                <Database className="w-3 h-3" />
+                <span>{dbProducts.length} LIVE PRODUCTS SYNCED</span>
+              </div>
+            )}
           </div>
 
           <h1 className="font-display text-4xl sm:text-6xl font-black uppercase text-white">
@@ -79,7 +143,7 @@ function ShopContent() {
         <div className="py-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between border-b border-white/5">
           {/* Category Tabs */}
           <div className="flex flex-wrap gap-2">
-            {categories.map((cat) => (
+            {categoriesList.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
@@ -168,4 +232,3 @@ export default function ShopPage() {
     </Suspense>
   );
 }
-

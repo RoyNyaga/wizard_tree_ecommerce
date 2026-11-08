@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { ShieldCheck, Sparkles } from 'lucide-react';
 
 export function AgeGate() {
+  const pathname = usePathname();
   const { isAgeVerified, verifyAge } = useCart();
   const [remember, setRemember] = useState(true);
 
-  if (isAgeVerified) return null;
+  // Do not block admin workspace with customer age gate
+  if (pathname?.startsWith('/admin') || isAgeVerified) return null;
 
   const handleExit = () => {
     window.location.href = 'https://google.com';

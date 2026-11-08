@@ -2,10 +2,15 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, CartItem } from '@/types';
+import { FlyToCartOverlay, FlyingItem } from '@/components/shop/FlyToCartOverlay';
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, options?: { size?: string; weight?: string; quantity?: number }) => void;
+  addToCart: (
+    product: Product,
+    options?: { size?: string; weight?: string; quantity?: number },
+    startCoord?: { x: number; y: number }
+  ) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
@@ -19,6 +24,7 @@ interface CartContextType {
   verifyAge: (remember: boolean) => void;
   toastMessage: string | null;
   showToast: (message: string) => void;
+  isCartBumping: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,8 +32,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isAgeVerified, setIsAgeVerified] = useState(true); // Default to true on SSR to avoid hydration flash, will check in useEffect
+  const [isAgeVerified, setIsAgeVerified] = useState(true); // Default true for SSR
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [flyingItem, setFlyingItem] = useState<FlyingItem | null>(null);
+  const [isCartBumping, setIsCartBumping] = useState(false);
 
   // Initialize from localStorage
   useEffect(() => {
@@ -73,9 +81,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const triggerFlyAnimation = (
+    image: string,
+    startCoord?: { x: number; y: number }
+  ) => {
+    if (typeof window === 'undefined') return;
+
+    // Locate the navbar cart button
+    const cartButton = document.getElementById('navbar-cart-btn');
+    const targetRect = cartButton?.getBoundingClientRect();
+
+    const startX = startCoord?.x ?? (window.innerWidth / 2);
+    const startY = startCoord?.y ?? (window.innerHeight / 2);
+
+    const targetX = targetRect ? targetRect.left + targetRect.width / 2 : window.innerWidth - 60;
+    const targetY = targetRect ? targetRect.top + targetRect.height / 2 : 50;
+
+    setFlyingItem({
+      id: Math.random().toString(),
+      image,
+      startX,
+      startY,
+      targetX,
+      targetY,
+    });
+  };
+
+  const handleFlyComplete = () => {
+    setFlyingItem(null);
+    setIsCartBumping(true);
+    setTimeout(() => setIsCartBumping(false), 500);
+  };
+
   const addToCart = (
     product: Product,
-    options?: { size?: string; weight?: string; quantity?: number }
+    options?: { size?: string; weight?: string; quantity?: number },
+    startCoord?: { x: number; y: number }
   ) => {
     const qty = options?.quantity || 1;
     const size = options?.size;
@@ -83,6 +124,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
     const variantKey = size || weight || 'default';
     const uniqueId = `${product.id}-${variantKey}`;
+
+    // Trigger Fly-to-Cart Framer Motion animation
+    triggerFlyAnimation(product.image, startCoord);
 
     setItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === uniqueId);
@@ -106,7 +150,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
 
     showToast(`Added ${product.name} to Bag`);
-    setIsCartOpen(true);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -151,9 +194,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         verifyAge,
         toastMessage,
         showToast,
+        isCartBumping,
       }}
     >
       {children}
+      <FlyToCartOverlay flyingItem={flyingItem} onComplete={handleFlyComplete} />
     </CartContext.Provider>
   );
 }
@@ -165,4 +210,3 @@ export function useCart() {
   }
   return context;
 }
-

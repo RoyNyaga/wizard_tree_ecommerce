@@ -24,12 +24,16 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
 
   if (!product) return null;
 
-  const handleAdd = () => {
-    addToCart(product, {
-      size: selectedSize,
-      weight: selectedWeight,
-      quantity,
-    });
+  const handleAdd = (e: React.MouseEvent) => {
+    addToCart(
+      product,
+      {
+        size: selectedSize,
+        weight: selectedWeight,
+        quantity,
+      },
+      { x: e.clientX, y: e.clientY }
+    );
     onClose();
   };
 
