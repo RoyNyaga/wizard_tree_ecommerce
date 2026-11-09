@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
+import { supabase } from '@/lib/supabase/client';
+import { getCurrentAdmin } from '@/lib/supabase/auth';
 import {
   ChevronLeft,
   ChevronRight,
@@ -14,7 +17,8 @@ import {
   ChevronDown,
   Menu,
   X,
-  Check
+  Check,
+  LayoutDashboard
 } from 'lucide-react';
 
 const ANNOUNCEMENTS = [
@@ -38,6 +42,47 @@ export function Navbar() {
   if (pathname?.startsWith('/admin')) {
     return null;
   }
+
+  // Admin auth state
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkAdminAuth() {
+      try {
+        const admin = await getCurrentAdmin();
+        if (mounted) {
+          setIsAdminLoggedIn(!!admin);
+        }
+      } catch {
+        if (mounted) {
+          setIsAdminLoggedIn(false);
+        }
+      }
+    }
+
+    checkAdminAuth();
+
+    // Listen for sign-in / sign-out events in real-time
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        try {
+          const admin = await getCurrentAdmin();
+          if (mounted) setIsAdminLoggedIn(!!admin);
+        } catch {
+          if (mounted) setIsAdminLoggedIn(false);
+        }
+      } else {
+        if (mounted) setIsAdminLoggedIn(false);
+      }
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Announcement ticker state
   const [announcementIdx, setAnnouncementIdx] = useState(0);
@@ -118,17 +163,21 @@ export function Navbar() {
                 <Menu className="w-6 h-6" />
               </button>
 
-              {/* Wizard Trees Brand Logo (Cursive Script) */}
-              <Link href="/" className="flex items-center gap-2 group">
+              {/* Wizard Trees Brand Logo Image */}
+              <Link href="/" className="flex items-center group py-0.5">
                 <div className="relative flex items-center justify-center">
-                  {/* Stylized Script Wizard Trees Mark matching the image */}
-                  <span className="font-serif italic font-extrabold text-2xl sm:text-[26px] tracking-tight text-white select-none drop-shadow-md">
-                    Wizard <span className="font-normal font-serif not-italic text-purple-200">Trees</span>
-                  </span>
+                  <Image
+                    src="/images/brand/logo.png"
+                    alt="Wizard Trees"
+                    width={130}
+                    height={40}
+                    priority
+                    className="h-8 sm:h-9 w-auto object-contain transition-transform duration-200 group-hover:scale-105 drop-shadow-md"
+                  />
                 </div>
               </Link>
 
-              {/* Desktop Links: Home, Catalog, Contact */}
+              {/* Desktop Links: Home, Catalog, Contact, Dashboard (if logged in) */}
               <nav className="hidden md:flex items-center gap-7 text-[15px] font-normal tracking-wide text-white">
                 <Link
                   href="/"
@@ -148,6 +197,15 @@ export function Navbar() {
                 >
                   Contact
                 </Link>
+                {isAdminLoggedIn && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-900/40 px-3.5 py-1 text-xs font-mono font-bold tracking-wider uppercase text-purple-200 hover:bg-white hover:text-black hover:border-white transition shadow-sm shadow-purple-950/50"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 text-wizard-lime" />
+                    <span>Dashboard</span>
+                  </Link>
+                )}
               </nav>
             </div>
 
@@ -200,13 +258,17 @@ export function Navbar() {
                 <Search className="w-5 h-5 stroke-[1.8]" />
               </button>
 
-              {/* User Account Icon */}
+              {/* User Account / Admin Dashboard Link */}
               <Link
-                href="/about"
-                className="text-white hover:text-purple-200 transition-colors p-1"
-                aria-label="Account"
+                href={isAdminLoggedIn ? "/admin/dashboard" : "/admin/login"}
+                className="relative text-white hover:text-purple-200 transition-colors p-1"
+                aria-label={isAdminLoggedIn ? "Admin Dashboard" : "Sign In"}
+                title={isAdminLoggedIn ? "Admin Dashboard" : "Sign In"}
               >
                 <User className="w-5 h-5 stroke-[1.8]" />
+                {isAdminLoggedIn && (
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-wizard-lime ring-2 ring-[#360e5b]" />
+                )}
               </Link>
 
               {/* Shopping Bag Icon with Cart Count */}
@@ -282,9 +344,19 @@ export function Navbar() {
             <div>
               {/* Header with Close Button */}
               <div className="flex items-center justify-between pb-6 border-b border-white/10">
-                <span className="font-serif italic font-bold text-xl text-white">
-                  Wizard Trees
-                </span>
+                <Link
+                  href="/"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center"
+                >
+                  <Image
+                    src="/images/brand/logo.png"
+                    alt="Wizard Trees"
+                    width={110}
+                    height={34}
+                    className="h-8 w-auto object-contain"
+                  />
+                </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="p-1 text-white/70 hover:text-white"
@@ -317,6 +389,16 @@ export function Navbar() {
                 >
                   Contact
                 </Link>
+                {isAdminLoggedIn && (
+                  <Link
+                    href="/admin/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-2 text-wizard-lime font-mono text-base font-bold uppercase tracking-wider pt-3 border-t border-white/10"
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
               </nav>
             </div>
 

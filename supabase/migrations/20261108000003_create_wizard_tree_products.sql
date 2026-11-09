@@ -8,6 +8,7 @@ create table if not exists public.wizard_tree_products (
   category_id uuid references public.wizard_tree_product_categories(id) on delete set null,
   category text not null default 'flower',
   name text not null,
+  lineage text,
   description text,
   price numeric(10, 2) not null default 0.00,
   currency text not null default 'EUR',

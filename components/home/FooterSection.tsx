@@ -1,11 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
 export function FooterSection() {
+  const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

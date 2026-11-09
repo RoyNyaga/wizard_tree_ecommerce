@@ -45,6 +45,7 @@ export interface Product {
   slug: string;
   name: string;
   subtitle?: string;
+  lineage?: string; // e.g. "Rainbow Sherbet #11 x Pink Guava"
   category: ProductCategory;
   price: number;
   compareAtPrice?: number;

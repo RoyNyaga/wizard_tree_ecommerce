@@ -40,7 +40,7 @@ export function SeedsSection() {
 
           {/* View Button */}
           <Link
-            href="/shop?cat=seeds"
+            href="/collection/seeds"
             className="px-5 py-1.5 sm:px-6 sm:py-2 rounded-md border border-white/75 bg-black/40 backdrop-blur-sm text-white font-sans text-[11px] sm:text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black hover:border-white transition-all duration-200 active:scale-95 shadow-xl shadow-black/80"
           >
             VIEW

@@ -6,6 +6,7 @@ export interface DbProduct {
   company_id: string;
   category_id?: string | null;
   name: string;
+  lineage?: string | null;
   description: string | null;
   category: string; // Slug fallback (e.g. 'flower', 'seeds', 'other')
   price: number;
@@ -67,6 +68,37 @@ export async function fetchCompanyProducts(
   }
 
   return (data || []) as DbProduct[];
+}
+
+export async function fetchCompanyProductById(id: string): Promise<DbProduct | null> {
+  if (!WIZARD_TREE_COMPANY_ID) {
+    console.warn('WIZARD_TREE_COMPANY_ID is not set.');
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('wizard_tree_products')
+    .select(`
+      *,
+      category_data:wizard_tree_product_categories(*)
+    `)
+    .eq('company_id', WIZARD_TREE_COMPANY_ID)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching product by ID with join:', error);
+    const { data: fallbackData } = await supabase
+      .from('wizard_tree_products')
+      .select('*')
+      .eq('company_id', WIZARD_TREE_COMPANY_ID)
+      .eq('id', id)
+      .maybeSingle();
+
+    return (fallbackData || null) as DbProduct | null;
+  }
+
+  return (data || null) as DbProduct | null;
 }
 
 export async function createProduct(input: Omit<CreateProductInput, 'company_id'>): Promise<DbProduct> {

@@ -91,11 +91,15 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
           <h3 className="mt-1 font-display text-base font-bold text-white transition-colors group-hover:text-purple-200">
             {product.name}
           </h3>
-          {product.subtitle && (
+          {product.lineage ? (
+            <p className="mt-1 line-clamp-1 font-mono text-[11px] text-purple-300">
+              {product.lineage}
+            </p>
+          ) : product.subtitle ? (
             <p className="mt-1 line-clamp-1 text-xs text-wizard-muted">
               {product.subtitle}
             </p>
-          )}
+          ) : null}
 
           {/* Variants info preview */}
           <div className="mt-2 flex flex-wrap gap-1">
@@ -145,4 +149,7 @@ export function ProductCard({ product, onQuickView }: ProductCardProps) {
     </div>
   );
 }
+
+export { CollectionProductCard } from './CollectionProductCard';
+
 

@@ -19,7 +19,8 @@ function mapDbProductToProduct(db: DbProduct): Product {
     id: db.id,
     slug: db.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
     name: db.name,
-    subtitle: `${catName} // LA CRAFT`,
+    subtitle: db.lineage || `${catName} // LA CRAFT`,
+    lineage: db.lineage || undefined,
     category: (catSlug as ProductCategory) || 'flower',
     price: Number(db.price),
     image: db.images?.[0] || '/images/products/rs11-jar.jpg',
@@ -147,11 +148,10 @@ function ShopContent() {
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`rounded-xl px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider transition ${
-                  activeCategory === cat.id
+                className={`rounded-xl px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider transition ${activeCategory === cat.id
                     ? 'bg-white text-black shadow-lg shadow-white/10'
                     : 'border border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:text-white'
-                }`}
+                  }`}
               >
                 {cat.label}
               </button>

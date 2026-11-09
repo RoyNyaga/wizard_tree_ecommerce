@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Product } from '@/types';
 import { useCart } from '@/context/CartContext';
-import { X, Plus, Minus, ShieldCheck, Sparkles, ShoppingBag } from 'lucide-react';
+import { X, Plus, Minus, ShieldCheck, Sparkles, ShoppingBag, Dna } from 'lucide-react';
 
 interface ProductModalProps {
   product: Product | null;
@@ -114,7 +114,13 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
               <h2 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-white">
                 {product.name}
               </h2>
-              {product.subtitle && (
+              {product.lineage && (
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-950/40 px-2.5 py-1 text-xs font-mono text-purple-200">
+                  <Dna className="w-3.5 h-3.5 text-wizard-purple-glow" />
+                  <span>Lineage: <strong className="text-white">{product.lineage}</strong></span>
+                </div>
+              )}
+              {product.subtitle && !product.lineage && (
                 <p className="mt-1 font-mono text-xs text-wizard-muted">
                   {product.subtitle}
                 </p>
