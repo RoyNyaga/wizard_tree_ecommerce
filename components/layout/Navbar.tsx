@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 
 const ANNOUNCEMENTS = [
-  { text: 'Send To Us On Telegram', link: 'https://t.me/Wizardtreesverified' },
+  { text: 'Send To Us On Telegram', link: 'https://t.me/wizardtree420' },
   { text: 'Worldwide Discreet Shipping Available', link: '/shop' },
   { text: 'Authentic Genetics & Streetwear Drops Live', link: '/shop' },
 ];
@@ -409,7 +409,7 @@ export function Navbar() {
                 <span className="text-white font-bold">{currency}</span>
               </div>
               <a
-                href="https://t.me/Wizardtreesverified"
+                href="https://t.me/wizardtree420"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center rounded-lg bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"

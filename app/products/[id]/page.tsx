@@ -323,7 +323,7 @@ export default function ProductShowPage() {
             {/* Shop Now Button -> Redirects to Telegram Link */}
             <div className="mt-6">
               <a
-                href="https://t.me/Wizardtreesverified"
+                href="https://t.me/wizardtree420"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white font-sans font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-[0.99] shadow-xl hover:border-white/40"
