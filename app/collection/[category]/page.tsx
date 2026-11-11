@@ -85,21 +85,10 @@ export default function CollectionCategoryPage() {
     queryFn: () => fetchCompanyProducts({ status: 'published' }),
   });
 
-  // Combine live Supabase products with fallback catalog items
+  // Display only real products gotten directly from Supabase
   const allProducts = useMemo(() => {
-    const liveItems: Product[] = dbProducts.map(mapDbProductToProduct);
-    if (categoryParam === 'flower') {
-      // User request: remove all dummy data in collection/flower page
-      return liveItems;
-    }
-    if (liveItems.length > 0) {
-      // Put live database items first, then catalog items
-      const existingIds = new Set(liveItems.map((p) => p.id));
-      const filteredCatalog = PRODUCTS_DATA.filter((p) => !existingIds.has(p.id));
-      return [...liveItems, ...filteredCatalog];
-    }
-    return PRODUCTS_DATA;
-  }, [dbProducts, categoryParam]);
+    return dbProducts.map(mapDbProductToProduct);
+  }, [dbProducts]);
 
   // Determine header texts
   const headerMeta = useMemo(() => {
@@ -126,10 +115,10 @@ export default function CollectionCategoryPage() {
     return allProducts.filter((product) => {
       const pCat = product.category?.toLowerCase() || '';
       if (categoryParam === 'flower') {
-        return pCat === 'flower';
+        return pCat === 'flower' || pCat === 'flowers';
       }
       if (categoryParam === 'seeds') {
-        return pCat === 'seeds';
+        return pCat === 'seeds' || pCat === 'seed';
       }
       if (categoryParam === 'other' || categoryParam === 'others') {
         return (
@@ -210,9 +199,8 @@ export default function CollectionCategoryPage() {
             >
               <span>Availability</span>
               <ChevronDown
-                className={`w-4 h-4 text-white/70 transition-transform duration-200 ${
-                  isAvailabilityOpen ? 'rotate-180' : ''
-                }`}
+                className={`w-4 h-4 text-white/70 transition-transform duration-200 ${isAvailabilityOpen ? 'rotate-180' : ''
+                  }`}
               />
               {availabilityFilter !== 'all' && (
                 <span className="w-1.5 h-1.5 rounded-full bg-wizard-purple-glow ml-0.5" />
@@ -238,11 +226,10 @@ export default function CollectionCategoryPage() {
                         setAvailabilityFilter(opt.id as AvailabilityFilter);
                         setIsAvailabilityOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${
-                        availabilityFilter === opt.id
+                      className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${availabilityFilter === opt.id
                           ? 'bg-white/15 text-white font-medium'
                           : 'text-white/70 hover:bg-white/5 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <span>{opt.label}</span>
                       {availabilityFilter === opt.id && <Check className="w-4 h-4 text-white" />}
@@ -272,9 +259,8 @@ export default function CollectionCategoryPage() {
               >
                 <span>Sort</span>
                 <ChevronDown
-                  className={`w-4 h-4 text-white/70 transition-transform duration-200 ${
-                    isSortOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`w-4 h-4 text-white/70 transition-transform duration-200 ${isSortOpen ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
 
@@ -299,11 +285,10 @@ export default function CollectionCategoryPage() {
                           setSortBy(opt.id as SortOption);
                           setIsSortOpen(false);
                         }}
-                        className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${
-                          sortBy === opt.id
+                        className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${sortBy === opt.id
                             ? 'bg-white/15 text-white font-medium'
                             : 'text-white/70 hover:bg-white/5 hover:text-white'
-                        }`}
+                          }`}
                       >
                         <span>{opt.label}</span>
                         {sortBy === opt.id && <Check className="w-4 h-4 text-white" />}
@@ -318,11 +303,10 @@ export default function CollectionCategoryPage() {
             <div className="hidden sm:flex items-center gap-1 border-l border-white/15 pl-4">
               <button
                 onClick={() => setGridCols(4)}
-                className={`p-1.5 rounded transition ${
-                  gridCols === 4
+                className={`p-1.5 rounded transition ${gridCols === 4
                     ? 'text-white bg-white/15'
                     : 'text-white/40 hover:text-white/80'
-                }`}
+                  }`}
                 title="4 Columns View"
                 aria-label="4 Columns View"
               >
@@ -330,11 +314,10 @@ export default function CollectionCategoryPage() {
               </button>
               <button
                 onClick={() => setGridCols(5)}
-                className={`p-1.5 rounded transition ${
-                  gridCols === 5
+                className={`p-1.5 rounded transition ${gridCols === 5
                     ? 'text-white bg-white/15'
                     : 'text-white/40 hover:text-white/80'
-                }`}
+                  }`}
                 title="5 Columns View"
                 aria-label="5 Columns View"
               >
@@ -349,11 +332,10 @@ export default function CollectionCategoryPage() {
         {/* ======================================================== */}
         {processedProducts.length > 0 ? (
           <div
-            className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${
-              gridCols === 4
+            className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${gridCols === 4
                 ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                 : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
-            }`}
+              }`}
           >
             {processedProducts.map((product) => (
               <CollectionProductCard

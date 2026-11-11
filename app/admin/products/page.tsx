@@ -3,27 +3,27 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  fetchCompanyProducts, 
-  createProduct, 
-  updateProduct, 
-  deleteProduct, 
-  DbProduct 
+import {
+  fetchCompanyProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  DbProduct
 } from '@/lib/supabase/products';
-import { 
-  fetchCompanyCategories, 
-  DbProductCategory 
+import {
+  fetchCompanyCategories,
+  DbProductCategory
 } from '@/lib/supabase/categories';
 import { uploadProductImage } from '@/lib/image-utils';
 import { ImageCropperModal } from '@/components/admin/ImageCropperModal';
-import { 
-  Plus, 
-  Search, 
-  Edit3, 
-  Trash2, 
-  X, 
-  Sparkles, 
-  Upload, 
+import {
+  Plus,
+  Search,
+  Edit3,
+  Trash2,
+  X,
+  Sparkles,
+  Upload,
   Star,
   Tag,
   Dna,
@@ -184,7 +184,7 @@ export default function AdminProductsPage() {
       createMutation.mutate({
         ...formData,
         availability: formData.quantity > 0,
-        currency: 'EUR',
+        currency: 'USD',
       });
     }
   };
@@ -220,11 +220,10 @@ export default function AdminProductsPage() {
         <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setCategoryFilter('all')}
-            className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${
-              categoryFilter === 'all'
-                ? 'bg-purple-950/60 border border-purple-500/50 text-white font-bold'
-                : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
-            }`}
+            className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${categoryFilter === 'all'
+              ? 'bg-purple-950/60 border border-purple-500/50 text-white font-bold'
+              : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
+              }`}
           >
             All Categories
           </button>
@@ -232,11 +231,10 @@ export default function AdminProductsPage() {
             <button
               key={cat.id}
               onClick={() => setCategoryFilter(cat.slug)}
-              className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${
-                categoryFilter === cat.slug
-                  ? 'bg-purple-950/60 border border-purple-500/50 text-white font-bold'
-                  : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
-              }`}
+              className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${categoryFilter === cat.slug
+                ? 'bg-purple-950/60 border border-purple-500/50 text-white font-bold'
+                : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
+                }`}
             >
               {cat.name}
             </button>
@@ -325,12 +323,11 @@ export default function AdminProductsPage() {
                         <span>{prod.category_data?.name || prod.category}</span>
                       </span>
                     </td>
-                    <td className="p-4 font-bold text-white">€{Number(prod.price).toFixed(2)}</td>
+                    <td className="p-4 font-bold text-white">${Number(prod.price).toFixed(2)}</td>
                     <td className="p-4">
                       <span
-                        className={`font-bold ${
-                          prod.quantity <= 5 ? 'text-amber-400' : 'text-white'
-                        }`}
+                        className={`font-bold ${prod.quantity <= 5 ? 'text-amber-400' : 'text-white'
+                          }`}
                       >
                         {prod.quantity}
                       </span>
@@ -343,11 +340,10 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="p-4">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                          prod.status === 'published'
-                            ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-white/10 text-white/50 border border-white/10'
-                        }`}
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold ${prod.status === 'published'
+                          ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-white/10 text-white/50 border border-white/10'
+                          }`}
                       >
                         {prod.status}
                       </span>
@@ -471,7 +467,7 @@ export default function AdminProductsPage() {
 
                 <div>
                   <label className="block text-xs font-mono uppercase text-white/70 mb-1">
-                    Price (€) *
+                    Price ($) *
                   </label>
                   <input
                     type="number"
@@ -622,8 +618,8 @@ export default function AdminProductsPage() {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-fade-in"
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-lg bg-[#0c0b14] border-l border-white/10 shadow-2xl p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
+          <div className="fixed inset-y-0 right-0 flex w-full max-w-full justify-end pl-0 sm:pl-10 pointer-events-none">
+            <div className="w-full sm:w-[500px] max-w-full bg-[#0c0b14] border-l border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col justify-between pointer-events-auto h-full overflow-y-auto">
               <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-start justify-between pb-4 border-b border-white/10">
@@ -633,11 +629,10 @@ export default function AdminProductsPage() {
                         {selectedProduct.category_data?.name || selectedProduct.category}
                       </span>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                          selectedProduct.status === 'published'
-                            ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-white/10 text-white/50 border border-white/10'
-                        }`}
+                        className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${selectedProduct.status === 'published'
+                          ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-white/10 text-white/50 border border-white/10'
+                          }`}
                       >
                         {selectedProduct.status}
                       </span>
@@ -682,11 +677,10 @@ export default function AdminProductsPage() {
                             <button
                               key={idx}
                               onClick={() => setActiveDrawerImage(idx)}
-                              className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${
-                                activeDrawerImage === idx
-                                  ? 'border-wizard-purple-glow shadow-md shadow-purple-500/40'
-                                  : 'border-white/10 opacity-60 hover:opacity-100'
-                              }`}
+                              className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition flex-shrink-0 ${activeDrawerImage === idx
+                                ? 'border-wizard-purple-glow shadow-md shadow-purple-500/40'
+                                : 'border-white/10 opacity-60 hover:opacity-100'
+                                }`}
                             >
                               <Image src={img} alt="" fill className="object-cover" />
                             </button>
@@ -706,17 +700,16 @@ export default function AdminProductsPage() {
                   <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
                     <span className="text-[10px] uppercase text-white/50 block">Retail Price</span>
                     <span className="text-xl font-bold text-white mt-1 block">
-                      €{Number(selectedProduct.price).toFixed(2)}
+                      ${Number(selectedProduct.price).toFixed(2)}
                     </span>
-                    <span className="text-[10px] text-white/40">{selectedProduct.currency || 'EUR'}</span>
+                    <span className="text-[10px] text-white/40">{selectedProduct.currency || 'USD'}</span>
                   </div>
 
                   <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5">
                     <span className="text-[10px] uppercase text-white/50 block">Inventory Stock</span>
                     <span
-                      className={`text-xl font-bold mt-1 block ${
-                        selectedProduct.quantity <= 5 ? 'text-amber-400' : 'text-white'
-                      }`}
+                      className={`text-xl font-bold mt-1 block ${selectedProduct.quantity <= 5 ? 'text-amber-400' : 'text-white'
+                        }`}
                     >
                       {selectedProduct.quantity} units
                     </span>
@@ -724,8 +717,8 @@ export default function AdminProductsPage() {
                       {selectedProduct.quantity > 5
                         ? 'In Stock'
                         : selectedProduct.quantity > 0
-                        ? 'Low Stock Warning'
-                        : 'Out of Stock'}
+                          ? 'Low Stock Warning'
+                          : 'Out of Stock'}
                     </span>
                   </div>
 

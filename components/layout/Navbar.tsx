@@ -22,14 +22,14 @@ import {
 } from 'lucide-react';
 
 const ANNOUNCEMENTS = [
-  { text: 'Send To Us On Telegram', link: 'https://t.me' },
+  { text: 'Send To Us On Telegram', link: 'https://t.me/Wizardtreesverified' },
   { text: 'Worldwide Discreet Shipping Available', link: '/shop' },
   { text: 'Authentic Genetics & Streetwear Drops Live', link: '/shop' },
 ];
 
 const CURRENCIES = [
-  { code: 'EUR', symbol: '€', label: 'EUR €' },
   { code: 'USD', symbol: '$', label: 'USD $' },
+  { code: 'EUR', symbol: '€', label: 'EUR €' },
   { code: 'GBP', symbol: '£', label: 'GBP £' },
   { code: 'CAD', symbol: '$', label: 'CAD $' },
 ];
@@ -88,7 +88,7 @@ export function Navbar() {
   const [announcementIdx, setAnnouncementIdx] = useState(0);
 
   // Currency dropdown state
-  const [currency, setCurrency] = useState('EUR');
+  const [currency, setCurrency] = useState('USD');
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
 
   // Search overlay state
@@ -409,7 +409,7 @@ export function Navbar() {
                 <span className="text-white font-bold">{currency}</span>
               </div>
               <a
-                href="https://t.me"
+                href="https://t.me/Wizardtreesverified"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center rounded-lg bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"

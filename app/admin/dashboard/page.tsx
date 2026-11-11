@@ -8,7 +8,7 @@ import { fetchCompanyOrders } from '@/lib/supabase/orders';
 import { 
   ShoppingBag, 
   Package, 
-  Euro, 
+  DollarSign, 
   Clock, 
   ArrowRight, 
   Sparkles,
@@ -39,8 +39,8 @@ export default function AdminDashboardPage() {
   const stats = [
     {
       label: 'Paid Revenue',
-      value: `€${totalRevenue.toFixed(2)}`,
-      icon: Euro,
+      value: `$${totalRevenue.toFixed(2)}`,
+      icon: DollarSign,
       color: 'text-emerald-400',
       bg: 'bg-emerald-950/20 border-emerald-500/20',
     },
@@ -189,7 +189,7 @@ export default function AdminDashboardPage() {
                       {ord.city}, {ord.country}
                     </td>
                     <td className="p-4 font-bold text-white">
-                      €{Number(ord.total_cost).toFixed(2)}
+                      ${Number(ord.total_cost).toFixed(2)}
                     </td>
                     <td className="p-4">
                       <span
