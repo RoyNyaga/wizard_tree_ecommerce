@@ -4,17 +4,17 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCompanyOrders, updateOrderStatus, DbOrder } from '@/lib/supabase/orders';
-import { 
-  ShoppingBag, 
-  Search, 
-  X, 
-  MapPin, 
-  Mail, 
-  Phone, 
-  CheckCircle2, 
-  Clock, 
-  Check, 
-  AlertCircle 
+import {
+  ShoppingBag,
+  Search,
+  X,
+  MapPin,
+  Mail,
+  Phone,
+  CheckCircle2,
+  Clock,
+  Check,
+  AlertCircle
 } from 'lucide-react';
 
 const STATUS_FILTERS = [
@@ -76,11 +76,10 @@ export default function AdminOrdersPage() {
             <button
               key={f.id}
               onClick={() => setStatusFilter(f.id)}
-              className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${
-                statusFilter === f.id
+              className={`rounded-lg px-3 py-1.5 font-mono text-xs uppercase tracking-wider transition ${statusFilter === f.id
                   ? 'bg-purple-950/60 border border-purple-500/50 text-white font-bold'
                   : 'bg-white/5 border border-white/10 text-white/60 hover:text-white'
-              }`}
+                }`}
             >
               {f.label}
             </button>
@@ -140,19 +139,18 @@ export default function AdminOrdersPage() {
                       {ord.items?.length || 1} item(s)
                     </td>
                     <td className="p-4 font-bold text-white">
-                      €{Number(ord.total_cost).toFixed(2)}
+                      ${Number(ord.total_cost).toFixed(2)}
                     </td>
                     <td className="p-4">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                          ord.status === 'paid'
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] uppercase font-bold ${ord.status === 'paid'
                             ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
                             : ord.status === 'in_progress'
-                            ? 'bg-blue-950/60 text-blue-400 border border-blue-500/30'
-                            : ord.status === 'cancelled'
-                            ? 'bg-red-950/60 text-red-400 border border-red-500/30'
-                            : 'bg-amber-950/60 text-amber-400 border border-amber-500/30'
-                        }`}
+                              ? 'bg-blue-950/60 text-blue-400 border border-blue-500/30'
+                              : ord.status === 'cancelled'
+                                ? 'bg-red-950/60 text-red-400 border border-red-500/30'
+                                : 'bg-amber-950/60 text-amber-400 border border-amber-500/30'
+                          }`}
                       >
                         {ord.status.replace('_', ' ')}
                       </span>
@@ -183,8 +181,8 @@ export default function AdminOrdersPage() {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
           />
 
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div className="w-screen max-w-lg bg-[#0c0b14] border-l border-white/10 shadow-2xl p-6 sm:p-8 flex flex-col justify-between overflow-y-auto">
+          <div className="fixed inset-y-0 right-0 flex w-full max-w-full justify-end pl-0 sm:pl-10 pointer-events-none">
+            <div className="w-full sm:w-[500px] max-w-full bg-[#0c0b14] border-l border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col justify-between pointer-events-auto h-full overflow-y-auto">
               <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between pb-4 border-b border-white/10">
@@ -214,11 +212,10 @@ export default function AdminOrdersPage() {
                       onClick={() =>
                         statusMutation.mutate({ id: selectedOrder.id, status: 'pending' })
                       }
-                      className={`py-2 px-3 rounded-lg border transition ${
-                        selectedOrder.status === 'pending'
+                      className={`py-2 px-3 rounded-lg border transition ${selectedOrder.status === 'pending'
                           ? 'border-amber-400 bg-amber-950/40 text-amber-300 font-bold'
                           : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                      }`}
+                        }`}
                     >
                       Pending
                     </button>
@@ -226,11 +223,10 @@ export default function AdminOrdersPage() {
                       onClick={() =>
                         statusMutation.mutate({ id: selectedOrder.id, status: 'in_progress' })
                       }
-                      className={`py-2 px-3 rounded-lg border transition ${
-                        selectedOrder.status === 'in_progress'
+                      className={`py-2 px-3 rounded-lg border transition ${selectedOrder.status === 'in_progress'
                           ? 'border-blue-400 bg-blue-950/40 text-blue-300 font-bold'
                           : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                      }`}
+                        }`}
                     >
                       In Progress
                     </button>
@@ -238,11 +234,10 @@ export default function AdminOrdersPage() {
                       onClick={() =>
                         statusMutation.mutate({ id: selectedOrder.id, status: 'paid' })
                       }
-                      className={`py-2 px-3 rounded-lg border transition ${
-                        selectedOrder.status === 'paid'
+                      className={`py-2 px-3 rounded-lg border transition ${selectedOrder.status === 'paid'
                           ? 'border-emerald-400 bg-emerald-950/40 text-emerald-300 font-bold'
                           : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                      }`}
+                        }`}
                     >
                       Paid
                     </button>
@@ -250,11 +245,10 @@ export default function AdminOrdersPage() {
                       onClick={() =>
                         statusMutation.mutate({ id: selectedOrder.id, status: 'cancelled' })
                       }
-                      className={`py-2 px-3 rounded-lg border transition ${
-                        selectedOrder.status === 'cancelled'
+                      className={`py-2 px-3 rounded-lg border transition ${selectedOrder.status === 'cancelled'
                           ? 'border-red-400 bg-red-950/40 text-red-300 font-bold'
                           : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
-                      }`}
+                        }`}
                     >
                       Cancelled
                     </button>
@@ -304,12 +298,12 @@ export default function AdminOrdersPage() {
                             <div>
                               <p className="font-bold text-white">{item.product_name}</p>
                               <p className="text-[11px] text-white/40">
-                                Qty: {item.quantity} × €{Number(item.unit_price).toFixed(2)}
+                                Qty: {item.quantity} × ${Number(item.unit_price).toFixed(2)}
                               </p>
                             </div>
                           </div>
                           <span className="font-bold text-white">
-                            €{Number(item.total_price).toFixed(2)}
+                            ${Number(item.total_price).toFixed(2)}
                           </span>
                         </div>
                       ))
@@ -323,7 +317,7 @@ export default function AdminOrdersPage() {
                 <div className="pt-2 border-t border-white/10 font-mono text-xs flex justify-between items-center">
                   <span className="text-white/60 uppercase">Total Order Value</span>
                   <span className="font-display font-black text-xl text-emerald-400">
-                    €{Number(selectedOrder.total_cost).toFixed(2)}
+                    ${Number(selectedOrder.total_cost).toFixed(2)}
                   </span>
                 </div>
               </div>

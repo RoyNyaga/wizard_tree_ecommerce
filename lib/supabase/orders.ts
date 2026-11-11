@@ -84,7 +84,7 @@ export async function placeOrder(input: CreateOrderInput): Promise<DbOrder> {
       postal_code: input.postal_code,
       address: input.address,
       total_cost: input.total_cost,
-      currency: input.currency || 'EUR',
+      currency: input.currency || 'USD',
       status: 'pending',
       notes: input.notes || null,
     })

@@ -27,7 +27,7 @@ export function FooterSection() {
         {/* Top Left: Telegram Announcement */}
         <div className="mb-10 sm:mb-14">
           <a
-            href="https://t.me"
+            href="https://t.me/wizardtree420"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block group"

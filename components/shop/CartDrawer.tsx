@@ -6,15 +6,15 @@ import Link from 'next/link';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCart } from '@/context/CartContext';
 import { placeOrder, DbOrder } from '@/lib/supabase/orders';
-import { 
-  X, 
-  Trash2, 
-  Plus, 
-  Minus, 
-  ArrowRight, 
+import {
+  X,
+  Trash2,
+  Plus,
+  Minus,
+  ArrowRight,
   ArrowLeft,
-  ShieldCheck, 
-  Sparkles, 
+  ShieldCheck,
+  Sparkles,
   CheckCircle2,
   Lock,
   AlertCircle
@@ -104,7 +104,7 @@ export function CartDrawer() {
         postal_code: shippingForm.postalCode,
         address: shippingForm.address,
         total_cost: Number(finalTotal.toFixed(2)),
-        currency: 'EUR',
+        currency: 'USD',
         notes: shippingForm.notes || undefined,
         items: items.map((item) => ({
           product_id: item.product.id && !item.product.id.startsWith('wt-') ? item.product.id : null,
@@ -117,7 +117,7 @@ export function CartDrawer() {
       };
 
       const createdOrder = await placeOrder(orderPayload);
-      
+
       // Invalidate admin queries so live orders update in real-time
       queryClient.invalidateQueries({ queryKey: ['admin_orders'] });
       queryClient.invalidateQueries({ queryKey: ['admin_products'] });
@@ -149,9 +149,9 @@ export function CartDrawer() {
         className="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity animate-fade-in"
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-lg bg-[#0b0a12] border-l border-white/10 shadow-2xl flex flex-col justify-between">
-          
+      <div className="fixed inset-y-0 right-0 flex w-full max-w-full justify-end pl-0 sm:pl-10 pointer-events-none">
+        <div className="w-full sm:w-[480px] max-w-full bg-[#0b0a12] border-l border-white/10 shadow-2xl flex flex-col justify-between pointer-events-auto h-full overflow-hidden">
+
           {/* ======================================================== */}
           {/* HEADER                                                   */}
           {/* ======================================================== */}
@@ -171,8 +171,8 @@ export function CartDrawer() {
                 {viewMode === 'confirmation'
                   ? 'ORDER CONFIRMATION'
                   : viewMode === 'checkout'
-                  ? 'SECURE CHECKOUT'
-                  : `YOUR BAG (${totalItems})`}
+                    ? 'SECURE CHECKOUT'
+                    : `YOUR BAG (${totalItems})`}
               </h2>
             </div>
             <button
@@ -216,7 +216,7 @@ export function CartDrawer() {
                 </div>
                 <div className="flex justify-between text-wizard-muted">
                   <span>Total Paid / Due:</span>
-                  <span className="text-wizard-purple-glow font-bold">€{Number(placedOrder.total_cost).toFixed(2)}</span>
+                  <span className="text-wizard-purple-glow font-bold">${Number(placedOrder.total_cost).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-wizard-muted pt-2 border-t border-white/5">
                   <span>Admin Status:</span>
@@ -387,21 +387,21 @@ export function CartDrawer() {
                 <div className="space-y-1.5 font-mono text-xs">
                   <div className="flex justify-between text-wizard-muted">
                     <span>Items ({totalItems})</span>
-                    <span className="text-white">€{subtotal.toFixed(2)}</span>
+                    <span className="text-white">${subtotal.toFixed(2)}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-wizard-lime">
                       <span>Promo Discount</span>
-                      <span>-€{(subtotal * discount).toFixed(2)}</span>
+                      <span>-${(subtotal * discount).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-wizard-muted">
                     <span>Discreet Shipping</span>
-                    <span className="text-white">{shippingFee === 0 ? 'FREE' : `€${shippingFee.toFixed(2)}`}</span>
+                    <span className="text-white">{shippingFee === 0 ? 'FREE' : `$${shippingFee.toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-white/10">
                     <span>Total Cost</span>
-                    <span className="text-emerald-400 font-mono">€{finalTotal.toFixed(2)}</span>
+                    <span className="text-emerald-400 font-mono">${finalTotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -414,7 +414,7 @@ export function CartDrawer() {
                     <span>CONFIRMING WITH BACKEND...</span>
                   ) : (
                     <>
-                      <span>CONFIRM & PLACE ORDER (€{finalTotal.toFixed(2)})</span>
+                      <span>CONFIRM & PLACE ORDER (${finalTotal.toFixed(2)})</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -433,7 +433,7 @@ export function CartDrawer() {
                 <div className="bg-white/[0.02] border-b border-white/5 px-6 py-3.5 text-xs font-mono">
                   {amountRemaining > 0 ? (
                     <p className="text-wizard-muted">
-                      Add <span className="text-white font-bold">€{amountRemaining.toFixed(2)}</span> more for Free Priority Shipping
+                      Add <span className="text-white font-bold">${amountRemaining.toFixed(2)}</span> more for Free Priority Shipping
                     </p>
                   ) : (
                     <p className="text-emerald-400 font-semibold flex items-center gap-1.5">
@@ -529,8 +529,8 @@ export function CartDrawer() {
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
-                          <span className="font-mono text-sm font-bold text-white">
-                            €{(item.price * item.quantity).toFixed(2)}
+                          <span className="font-mono text-sm font-bold text-white whitespace-nowrap">
+                            ${(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -541,7 +541,7 @@ export function CartDrawer() {
 
               {/* Footer / Summary */}
               {items.length > 0 && (
-                <div className="p-6 border-t border-white/10 bg-[#08080c] space-y-4">
+                <div className="p-4 sm:p-6 border-t border-white/10 bg-[#08080c] space-y-4">
                   {/* Promo Code Input */}
                   <form onSubmit={applyPromo} className="flex gap-2">
                     <input
@@ -549,11 +549,11 @@ export function CartDrawer() {
                       placeholder="Promo Code (e.g. WIZARD10)"
                       value={promoCode}
                       onChange={(e) => setPromoCode(e.target.value)}
-                      className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-white placeholder-white/30 outline-none focus:border-wizard-purple-glow uppercase"
+                      className="flex-1 min-w-0 rounded-lg border border-white/10 bg-white/5 px-3 py-2 font-mono text-xs text-white placeholder-white/30 outline-none focus:border-wizard-purple-glow uppercase"
                     />
                     <button
                       type="submit"
-                      className="rounded-lg border border-white/20 bg-white/10 px-4 py-2 font-mono text-xs font-semibold text-white hover:bg-white hover:text-black transition uppercase"
+                      className="flex-shrink-0 rounded-lg border border-white/20 bg-white/10 px-4 py-2 font-mono text-xs font-semibold text-white hover:bg-white hover:text-black transition uppercase"
                     >
                       Apply
                     </button>
@@ -566,24 +566,24 @@ export function CartDrawer() {
                   <div className="space-y-1.5 font-mono text-xs">
                     <div className="flex justify-between text-wizard-muted">
                       <span>Subtotal</span>
-                      <span className="text-white">€{subtotal.toFixed(2)}</span>
+                      <span className="text-white">${subtotal.toFixed(2)}</span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-wizard-lime">
                         <span>VIP Discount ({(discount * 100).toFixed(0)}%)</span>
-                        <span>-€{(subtotal * discount).toFixed(2)}</span>
+                        <span>-${(subtotal * discount).toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-wizard-muted">
                       <span>Estimated Shipping</span>
                       <span className="text-white">
-                        {amountRemaining === 0 ? 'FREE' : '€12.00'}
+                        {amountRemaining === 0 ? 'FREE' : '$12.00'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
                       <span>Total</span>
                       <span className="text-wizard-purple-glow font-mono font-bold">
-                        €{finalTotal.toFixed(2)}
+                        ${finalTotal.toFixed(2)}
                       </span>
                     </div>
                   </div>

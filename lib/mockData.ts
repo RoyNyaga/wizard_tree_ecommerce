@@ -285,48 +285,6 @@ export const PRODUCTS_DATA: Product[] = [
     createdAt: '2026-01-25',
   },
 
-  // SEEDS & GENETICS
-  {
-    id: 'prod-seeds-zangria-s1',
-    slug: 'zangria-s1-seed-pack',
-    name: 'ZANGRIA S1 // Feminized Breeder Seed Pack',
-    lineage: 'Zkittlez x Thin Mint GSC S1',
-    subtitle: 'Lineage: Zkittlez x Thin Mint GSC S1',
-    category: 'seeds',
-    price: 250.00,
-    image: '/images/home/7.jpg',
-    galleryImages: ['/images/home/7.jpg'],
-    description: 'Collector seed pack containing 6 feminized seeds of the revered Zangria cut. Inspected for peak viability and packaged in tamper-evident cosmic hologram foil.',
-    details: [
-      '6 Feminized Seeds per pack',
-      'Flowering Time: 56-63 Days',
-      'High terpene production, heavy violet pigmentation',
-      'For souvenir and genetic preservation purposes',
-    ],
-    stockStatus: 'low_stock',
-    badge: 'COLLECTORS DROP',
-    isFeatured: true,
-    isNewDrop: true,
-    createdAt: '2026-02-10',
-  },
-  {
-    id: 'prod-seeds-rs11-cross',
-    slug: 'rs11-x-zoap-reg-seeds',
-    name: 'RS-11 x ZOAP // Regular Seeds (12pk)',
-    lineage: 'RS-11 x ZOAP',
-    subtitle: 'Lineage: RS-11 x ZOAP',
-    category: 'seeds',
-    price: 300.00,
-    image: '/images/home/7.jpg',
-    galleryImages: ['/images/home/7.jpg'],
-    description: 'Two legendary phenotypes united in one unprecedented breeding line. Outstanding phenotype variety for elite phenotype hunting.',
-    details: ['12 Regular Seeds', 'Pheno-hunt grade', 'Authenticity chip embedded in packaging'],
-    stockStatus: 'sold_out',
-    badge: 'SOLD OUT',
-    isFeatured: false,
-    createdAt: '2026-01-05',
-  },
-
   // STREETWEAR & MERCH
   {
     id: 'prod-merch-hoodie-obsidian',

@@ -262,16 +262,16 @@ export default function ProductShowPage() {
               /* Other photo counts: dynamic responsive multi-image layout */
               <div
                 className={`grid gap-3 sm:gap-4 w-full ${images.length === 2
-                    ? 'grid-cols-2'
-                    : 'grid-cols-2 sm:grid-cols-3'
+                  ? 'grid-cols-2'
+                  : 'grid-cols-2 sm:grid-cols-3'
                   }`}
               >
                 {images.map((imgUrl, idx) => (
                   <div
                     key={idx}
                     className={`relative aspect-square w-full rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 border border-white/10 shadow-lg group ${images.length === 3 && idx === 0
-                        ? 'col-span-2 aspect-[16/10]'
-                        : ''
+                      ? 'col-span-2 aspect-[16/10]'
+                      : ''
                       }`}
                   >
                     <Image
@@ -323,7 +323,7 @@ export default function ProductShowPage() {
             {/* Shop Now Button -> Redirects to Telegram Link */}
             <div className="mt-6">
               <a
-                href="https://linkfly.to/wizardtree420"
+                href="https://t.me/wizardtree420"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white font-sans font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-[0.99] shadow-xl hover:border-white/40"
