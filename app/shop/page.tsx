@@ -149,8 +149,8 @@ function ShopContent() {
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={`rounded-xl px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider transition ${activeCategory === cat.id
-                    ? 'bg-white text-black shadow-lg shadow-white/10'
-                    : 'border border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:text-white'
+                  ? 'bg-white text-black shadow-lg shadow-white/10'
+                  : 'border border-white/10 bg-white/5 text-white/70 hover:border-white/30 hover:text-white'
                   }`}
               >
                 {cat.label}
@@ -191,7 +191,20 @@ function ShopContent() {
         )}
 
         {/* Product Grid */}
-        {filteredProducts.length === 0 ? (
+        {isSupabaseLoading && filteredProducts.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex flex-col animate-pulse rounded-2xl border border-white/5 bg-[#0b0a12] p-4">
+                <div className="aspect-square w-full rounded-xl bg-white/[0.04]" />
+                <div className="mt-4 space-y-2">
+                  <div className="h-4 w-3/4 rounded bg-white/[0.08]" />
+                  <div className="h-3 w-1/2 rounded bg-white/[0.04]" />
+                  <div className="h-4 w-1/4 rounded bg-white/[0.08] mt-2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredProducts.length === 0 ? (
           <div className="py-24 text-center">
             <div className="w-16 h-16 rounded-full bg-white/5 mx-auto flex items-center justify-center text-white/30 mb-4">
               <ShoppingBag className="w-7 h-7" />

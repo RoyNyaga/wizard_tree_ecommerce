@@ -8,6 +8,7 @@ import { PRODUCTS_DATA } from '@/lib/mockData';
 import { fetchCompanyProducts, DbProduct } from '@/lib/supabase/products';
 import { fetchCompanyCategories } from '@/lib/supabase/categories';
 import { CollectionProductCard } from '@/components/shop/CollectionProductCard';
+import { CollectionProductSkeleton } from '@/components/shop/CollectionProductSkeleton';
 import { ProductModal } from '@/components/shop/ProductModal';
 import {
   ChevronDown,
@@ -80,7 +81,7 @@ export default function CollectionCategoryPage() {
   });
 
   // Fetch live products from Supabase
-  const { data: dbProducts = [] } = useQuery({
+  const { data: dbProducts = [], isLoading } = useQuery({
     queryKey: ['public_products'],
     queryFn: () => fetchCompanyProducts({ status: 'published' }),
   });
@@ -227,8 +228,8 @@ export default function CollectionCategoryPage() {
                         setIsAvailabilityOpen(false);
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${availabilityFilter === opt.id
-                          ? 'bg-white/15 text-white font-medium'
-                          : 'text-white/70 hover:bg-white/5 hover:text-white'
+                        ? 'bg-white/15 text-white font-medium'
+                        : 'text-white/70 hover:bg-white/5 hover:text-white'
                         }`}
                     >
                       <span>{opt.label}</span>
@@ -244,7 +245,11 @@ export default function CollectionCategoryPage() {
           <div className="flex items-center gap-5 sm:gap-6 ml-auto">
             {/* Item Counter */}
             <span className="text-sm font-normal text-white/70">
-              {processedProducts.length} items
+              {isLoading ? (
+                <span className="inline-block w-14 h-4 bg-white/10 rounded animate-pulse align-middle" />
+              ) : (
+                `${processedProducts.length} items`
+              )}
             </span>
 
             {/* Sort Dropdown */}
@@ -286,8 +291,8 @@ export default function CollectionCategoryPage() {
                           setIsSortOpen(false);
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 text-xs sm:text-sm rounded-md transition ${sortBy === opt.id
-                            ? 'bg-white/15 text-white font-medium'
-                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                          ? 'bg-white/15 text-white font-medium'
+                          : 'text-white/70 hover:bg-white/5 hover:text-white'
                           }`}
                       >
                         <span>{opt.label}</span>
@@ -304,8 +309,8 @@ export default function CollectionCategoryPage() {
               <button
                 onClick={() => setGridCols(4)}
                 className={`p-1.5 rounded transition ${gridCols === 4
-                    ? 'text-white bg-white/15'
-                    : 'text-white/40 hover:text-white/80'
+                  ? 'text-white bg-white/15'
+                  : 'text-white/40 hover:text-white/80'
                   }`}
                 title="4 Columns View"
                 aria-label="4 Columns View"
@@ -315,8 +320,8 @@ export default function CollectionCategoryPage() {
               <button
                 onClick={() => setGridCols(5)}
                 className={`p-1.5 rounded transition ${gridCols === 5
-                    ? 'text-white bg-white/15'
-                    : 'text-white/40 hover:text-white/80'
+                  ? 'text-white bg-white/15'
+                  : 'text-white/40 hover:text-white/80'
                   }`}
                 title="5 Columns View"
                 aria-label="5 Columns View"
@@ -330,7 +335,18 @@ export default function CollectionCategoryPage() {
         {/* ======================================================== */}
         {/* PRODUCT GRID SECTION                                     */}
         {/* ======================================================== */}
-        {processedProducts.length > 0 ? (
+        {isLoading ? (
+          <div
+            className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${gridCols === 4
+                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+                : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+              }`}
+          >
+            {[...Array(gridCols === 4 ? 8 : 10)].map((_, i) => (
+              <CollectionProductSkeleton key={i} />
+            ))}
+          </div>
+        ) : processedProducts.length > 0 ? (
           <div
             className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${gridCols === 4
                 ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
