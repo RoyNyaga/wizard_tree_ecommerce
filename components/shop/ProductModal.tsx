@@ -247,6 +247,21 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Verified Cleanroom Cultivation // Los Angeles, CA</span>
               </div>
+
+              <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-white/50 pt-1">
+                <a
+                  href="https://t.me/Wizardtreesmessage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-purple-300 transition"
+                >
+                  Telegram: @Wizardtreesmessage
+                </a>
+                <span>•</span>
+                <a href="tel:+905010200650" className="hover:text-white transition">
+                  Call: +905010200650
+                </a>
+              </div>
             </div>
           </div>
         </div>

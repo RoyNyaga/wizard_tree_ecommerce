@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 
 export function FooterSection() {
   const pathname = usePathname();
@@ -24,21 +24,34 @@ export function FooterSection() {
     <footer className="w-full bg-black text-white overflow-hidden border-t border-white/[0.04]">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-14 pt-16 sm:pt-20 pb-10">
 
-        {/* Top Left: Telegram Announcement */}
-        <div className="mb-10 sm:mb-14">
+        {/* Top: Telegram Announcement & Direct Contact */}
+        <div className="mb-10 sm:mb-14 flex flex-col sm:flex-row sm:items-start justify-between gap-6">
           <a
-            href="https://t.me/wizardtree420"
+            href="https://t.me/Wizardtreesmessage"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block group"
           >
-            <h3 className="text-white font-bold text-sm sm:text-base uppercase tracking-wider font-sans group-hover:text-purple-300 transition-colors">
-              TELEGRAM ANNOUCEMENT
+            <h3 className="text-white font-bold text-sm sm:text-base uppercase tracking-wider font-sans group-hover:text-purple-300 transition-colors flex items-center gap-2">
+              <span>TELEGRAM ANNOUNCEMENT</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-purple-300 font-mono normal-case">@Wizardtreesmessage</span>
             </h3>
             <p className="text-white/70 text-xs sm:text-sm mt-1 group-hover:text-white transition-colors">
-              Get exclusive deals and early access to new products.
+              Get exclusive deals, verify batches, and order direct.
             </p>
           </a>
+
+          <div className="flex flex-col sm:items-end text-left sm:text-right">
+            <span className="text-xs uppercase tracking-wider text-white/50 font-sans font-semibold">DIRECT CONTACT / INQUIRIES</span>
+            <a
+              href="tel:+905010200650"
+              className="mt-1 text-sm sm:text-base font-bold text-white hover:text-purple-300 transition-colors font-mono flex items-center sm:justify-end gap-2"
+            >
+              <Phone className="w-4 h-4 text-purple-400" />
+              <span>+905010200650</span>
+            </a>
+            <span className="text-[11px] text-white/40 mt-0.5 font-sans">Direct line for discreet orders & customer support</span>
+          </div>
         </div>
 
         {/* Center: Subscribe to our emails */}
@@ -83,6 +96,13 @@ export function FooterSection() {
           <p>© 2026 Wizard Trees, Powered by Shopify</p>
 
           <div className="flex items-center gap-6">
+            <a
+              href="tel:+905010200650"
+              className="hover:text-white transition-colors flex items-center gap-1.5"
+            >
+              <Phone className="w-3 h-3 text-purple-400" />
+              <span>+905010200650</span>
+            </a>
             <a
               href="/about"
               className="hover:text-white transition-colors"

@@ -9,11 +9,54 @@ import { CartDrawer } from '@/components/shop/CartDrawer';
 import { Toast } from '@/components/ui/Toast';
 
 export const metadata: Metadata = {
-  title: 'WIZARD TREES // Los Angeles Craft Genetics & Streetwear',
-  description: 'Artisanal genetics and uncompromising indoor cultivation. Creators of ZOAP, RS-11, and Zangria. Boutique flower, seed lines, and custom-milled streetwear.',
-  keywords: ['Wizard Trees', 'ZOAP', 'RS-11', 'Zangria', 'Cannabis Genetics', 'Los Angeles Craft Flower', 'Streetwear Merch', 'Breeder Seeds'],
+  title: 'WIZARD TREES // Where Cannabis Meets Artistry | Los Angeles Craft Genetics',
+  description:
+    'Welcome to Wizard Trees, where cannabis meets artistry. Based in Los Angeles, we craft premium exotic strains, world-renowned genetics, and artisanal small-batch flower sought worldwide.',
+  keywords: [
+    'Wizard Trees',
+    'Where Cannabis Meets Artistry',
+    'ZOAP',
+    'RS-11',
+    'Zangria',
+    'Studio 54',
+    'Black Magic',
+    'Los Angeles Craft Cannabis',
+    'Exotic Strains',
+    'Cannabis Genetics',
+    'Breeder Seeds',
+    'Streetwear',
+  ],
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/images/brand/logo.png', type: 'image/png' },
+    ],
+    shortcut: '/images/brand/logo.png',
+    apple: [
+      { url: '/images/brand/logo.png', type: 'image/png' },
+    ],
+  },
+  openGraph: {
+    title: 'WIZARD TREES // Where Cannabis Meets Artistry',
+    description:
+      'Welcome to Wizard Trees, where cannabis meets artistry. Based in Los Angeles, we craft premium exotic strains, world-renowned genetics, and artisanal small-batch flower sought worldwide.',
+    siteName: 'Wizard Trees',
+    images: [
+      {
+        url: '/images/brand/logo.png',
+        width: 800,
+        height: 800,
+        alt: 'Wizard Trees Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'WIZARD TREES // Where Cannabis Meets Artistry',
+    description:
+      'Welcome to Wizard Trees, where cannabis meets artistry. Based in Los Angeles, we craft premium exotic strains, world-renowned genetics, and artisanal small-batch flower sought worldwide.',
+    images: ['/images/brand/logo.png'],
   },
 };
 
@@ -24,6 +67,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark scroll-smooth">
+      <head>
+        <link rel="icon" href="/images/brand/logo.png" type="image/png" />
+        <link rel="shortcut icon" href="/images/brand/logo.png" />
+        <link rel="apple-touch-icon" href="/images/brand/logo.png" />
+      </head>
       <body className="min-h-screen bg-[#07070a] text-white flex flex-col justify-between selection:bg-purple-600 selection:text-white">
         <QueryProvider>
           <CartProvider>
