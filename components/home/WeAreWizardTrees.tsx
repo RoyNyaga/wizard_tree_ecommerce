@@ -8,7 +8,7 @@ export function WeAreWizardTrees() {
     <section className="relative w-full bg-[#07040d] overflow-hidden flex items-center justify-center border-t border-white/[0.04]">
       {/* Container with widescreen height matching the banner */}
       <div className="relative w-full h-[420px] sm:h-[500px] md:h-[580px] lg:h-[660px] overflow-hidden flex items-center justify-center">
-        
+
         {/* Background Image: Mystical Wizard Trees Cottage Scene */}
         <div className="absolute inset-0 pointer-events-none">
           <Image
@@ -37,7 +37,7 @@ export function WeAreWizardTrees() {
 
           {/* Telegram Button */}
           <a
-            href="https://t.me/wizardtree420"
+            href="https://t.me/Wizardtreesmessage"
             target="_blank"
             rel="noopener noreferrer"
             className="px-5 py-1.5 sm:px-6 sm:py-2 rounded-md border border-white/75 bg-black/40 backdrop-blur-sm text-white font-sans text-[11px] sm:text-xs uppercase tracking-[0.2em] hover:bg-white hover:text-black hover:border-white transition-all duration-200 active:scale-95 shadow-xl shadow-black/80"

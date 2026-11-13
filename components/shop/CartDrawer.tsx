@@ -17,7 +17,9 @@ import {
   Sparkles,
   CheckCircle2,
   Lock,
-  AlertCircle
+  AlertCircle,
+  Phone,
+  ExternalLink,
 } from 'lucide-react';
 
 export function CartDrawer() {
@@ -221,6 +223,14 @@ export function CartDrawer() {
                 <div className="flex justify-between text-wizard-muted pt-2 border-t border-white/5">
                   <span>Admin Status:</span>
                   <span className="text-emerald-400 font-bold uppercase">{placedOrder.status}</span>
+                </div>
+                <div className="flex justify-between text-wizard-muted pt-2 border-t border-white/5">
+                  <span>Direct Contact:</span>
+                  <a href="tel:+905010200650" className="text-white hover:text-purple-300 font-bold">+905010200650</a>
+                </div>
+                <div className="flex justify-between text-wizard-muted">
+                  <span>Telegram Support:</span>
+                  <a href="https://t.me/Wizardtreesmessage" target="_blank" rel="noopener noreferrer" className="text-purple-300 hover:text-white font-bold">@Wizardtreesmessage</a>
                 </div>
               </div>
 
@@ -463,6 +473,23 @@ export function CartDrawer() {
                     <p className="text-xs text-wizard-muted max-w-xs">
                       Discover our legendary strains, limited seed packs, and custom-milled streetwear.
                     </p>
+
+                    <div className="pt-2 text-xs font-mono text-white/50 flex flex-col items-center gap-1.5">
+                      <span className="text-[11px] text-white/40">Need help or discrete assistance?</span>
+                      <a href="tel:+905010200650" className="text-white hover:text-purple-300 font-bold flex items-center gap-1.5">
+                        <Phone className="w-3 h-3 text-purple-400" />
+                        <span>+905010200650</span>
+                      </a>
+                      <a
+                        href="https://t.me/Wizardtreesmessage"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-300 hover:text-white flex items-center gap-1 text-[11px]"
+                      >
+                        <span>t.me/Wizardtreesmessage</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                      </a>
+                    </div>
                     <Link
                       href="/shop"
                       onClick={closeCart}
@@ -600,6 +627,34 @@ export function CartDrawer() {
                   <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-white/40">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                     <span>256-Bit Encrypted Secure Checkout</span>
+                  </div>
+
+                  {/* Direct Contact & Telegram in Shopping Bag */}
+                  <div className="pt-3 border-t border-white/10 space-y-2 font-mono text-[11px]">
+                    <div className="flex items-center justify-between text-white/70">
+                      <span className="flex items-center gap-1.5 text-white/50">
+                        <Phone className="w-3 h-3 text-purple-400" />
+                        <span>Phone / Inquiries:</span>
+                      </span>
+                      <a
+                        href="tel:+905010200650"
+                        className="text-white hover:text-purple-300 font-bold transition"
+                      >
+                        +905010200650
+                      </a>
+                    </div>
+                    <div className="flex items-center justify-between text-white/70">
+                      <span className="text-white/50">Direct Telegram:</span>
+                      <a
+                        href="https://t.me/Wizardtreesmessage"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-purple-300 hover:text-white font-bold transition flex items-center gap-1"
+                      >
+                        <span>@Wizardtreesmessage</span>
+                        <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               )}

@@ -18,11 +18,13 @@ import {
   Menu,
   X,
   Check,
-  LayoutDashboard
+  LayoutDashboard,
+  Phone,
 } from 'lucide-react';
 
 const ANNOUNCEMENTS = [
-  { text: 'Send To Us On Telegram', link: 'https://t.me/wizardtree420' },
+  { text: 'Send To Us On Telegram: @Wizardtreesmessage', link: 'https://t.me/Wizardtreesmessage' },
+  { text: 'Direct Inquiries & Orders: +905010200650', link: 'tel:+905010200650' },
   { text: 'Worldwide Discreet Shipping Available', link: '/shop' },
   { text: 'Authentic Genetics & Streetwear Drops Live', link: '/shop' },
 ];
@@ -403,19 +405,28 @@ export function Navbar() {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-6 border-t border-white/10 space-y-4 text-sm">
+            <div className="pt-6 border-t border-white/10 space-y-3 text-sm">
               <div className="flex items-center justify-between text-white/70">
                 <span>Currency</span>
                 <span className="text-white font-bold">{currency}</span>
               </div>
-              <a
-                href="https://t.me/wizardtree420"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-center rounded-lg bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"
-              >
-                Send To Us On Telegram
-              </a>
+              <div className="grid grid-cols-1 gap-2 pt-1">
+                <a
+                  href="https://t.me/Wizardtreesmessage"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-center rounded-lg bg-white/10 py-2.5 text-xs font-semibold text-white hover:bg-white/20 transition"
+                >
+                  Send To Us On Telegram (@Wizardtreesmessage)
+                </a>
+                <a
+                  href="tel:+905010200650"
+                  className="flex items-center justify-center gap-2 text-center rounded-lg border border-white/15 bg-black/40 py-2.5 text-xs font-semibold text-white/90 hover:bg-white hover:text-black transition"
+                >
+                  <Phone className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Call: +905010200650</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
