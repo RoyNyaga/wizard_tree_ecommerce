@@ -18,7 +18,6 @@ import {
   ExternalLink,
   ShieldCheck,
   Dna,
-  Phone,
 } from 'lucide-react';
 
 function mapDbProductToProduct(db: DbProduct): Product {
@@ -321,40 +320,17 @@ export default function ProductShowPage() {
               )}
             </div>
 
-            {/* Shop Now Button -> Redirects to Telegram Link */}
+            {/* Shop Now Button -> Redirects to Telegram Link (Opens in same tab) */}
             <div className="mt-6">
               <a
                 href="https://t.me/Wizardtreesmessage"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white font-sans font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-[0.99] shadow-xl hover:border-white/40"
               >
                 <span>Shop now</span>
                 <ExternalLink className="w-4 h-4 text-white/70" />
               </a>
-
-              {/* Contact Options: Phone & Telegram directly below Shop Now */}
-              <div className="mt-3.5 pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs font-sans">
-                <a
-                  href="tel:+905010200650"
-                  className="flex items-center gap-2 text-white/90 hover:text-purple-300 transition py-1.5 px-3 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 w-full sm:w-auto justify-center"
-                >
-                  <Phone className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-mono font-semibold">+905010200650</span>
-                </a>
-                <a
-                  href="https://t.me/Wizardtreesmessage"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-white/90 hover:text-purple-300 transition py-1.5 px-3 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 w-full sm:w-auto justify-center"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-mono">t.me/Wizardtreesmessage</span>
-                </a>
-              </div>
-
               <p className="mt-2 text-center text-[11px] text-white/50 font-sans">
-                Secure orders and discreet inquiries handled directly on Telegram & phone.
+                Secure orders and discreet inquiries handled directly on Telegram.
               </p>
             </div>
 

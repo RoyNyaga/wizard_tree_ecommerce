@@ -84,11 +84,10 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition ${
-                      activeImageIndex === idx
+                    className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 transition ${activeImageIndex === idx
                         ? 'border-wizard-purple-glow'
                         : 'border-white/10 opacity-60 hover:opacity-100'
-                    }`}
+                      }`}
                   >
                     <Image src={img} alt="" fill className="object-cover" />
                   </button>
@@ -149,11 +148,10 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                       <button
                         key={wt}
                         onClick={() => setSelectedWeight(wt)}
-                        className={`rounded-lg border px-4 py-2 font-mono text-xs font-semibold transition ${
-                          selectedWeight === wt
+                        className={`rounded-lg border px-4 py-2 font-mono text-xs font-semibold transition ${selectedWeight === wt
                             ? 'border-wizard-purple-glow bg-wizard-purple/20 text-white'
                             : 'border-white/10 bg-white/5 text-white/70 hover:border-white/30'
-                        }`}
+                          }`}
                       >
                         {wt}
                       </button>
@@ -173,11 +171,10 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                       <button
                         key={sz}
                         onClick={() => setSelectedSize(sz)}
-                        className={`min-w-10 rounded-lg border px-3 py-2 font-mono text-xs font-semibold transition ${
-                          selectedSize === sz
+                        className={`min-w-10 rounded-lg border px-3 py-2 font-mono text-xs font-semibold transition ${selectedSize === sz
                             ? 'border-wizard-purple-glow bg-wizard-purple/20 text-white'
                             : 'border-white/10 bg-white/5 text-white/70 hover:border-white/30'
-                        }`}
+                          }`}
                       >
                         {sz}
                       </button>
@@ -248,18 +245,12 @@ export function ProductModal({ product, onClose }: ProductModalProps) {
                 <span>Verified Cleanroom Cultivation // Los Angeles, CA</span>
               </div>
 
-              <div className="flex items-center justify-center gap-3 text-[11px] font-mono text-white/50 pt-1">
+              <div className="flex items-center justify-center text-[11px] font-mono text-white/50 pt-1">
                 <a
                   href="https://t.me/Wizardtreesmessage"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="hover:text-purple-300 transition"
                 >
-                  Telegram: @Wizardtreesmessage
-                </a>
-                <span>•</span>
-                <a href="tel:+905010200650" className="hover:text-white transition">
-                  Call: +905010200650
+                  Inquire Directly on Telegram
                 </a>
               </div>
             </div>
