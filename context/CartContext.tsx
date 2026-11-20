@@ -8,7 +8,7 @@ interface CartContextType {
   items: CartItem[];
   addToCart: (
     product: Product,
-    options?: { size?: string; weight?: string; quantity?: number },
+    options?: { size?: string; weight?: string; flavor?: string; flavorImage?: string; price?: number; quantity?: number },
     startCoord?: { x: number; y: number }
   ) => void;
   removeFromCart: (itemId: string) => void;
@@ -115,18 +115,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (
     product: Product,
-    options?: { size?: string; weight?: string; quantity?: number },
+    options?: { size?: string; weight?: string; flavor?: string; flavorImage?: string; price?: number; quantity?: number },
     startCoord?: { x: number; y: number }
   ) => {
     const qty = options?.quantity || 1;
     const size = options?.size;
     const weight = options?.weight;
+    const flavor = options?.flavor;
+    const flavorImage = options?.flavorImage;
+    const itemPrice = options?.price ?? product.price;
 
-    const variantKey = size || weight || 'default';
+    const variantKey = flavor ? `flavor-${flavor}` : size || weight || 'default';
     const uniqueId = `${product.id}-${variantKey}`;
 
-    // Trigger Fly-to-Cart Framer Motion animation
-    triggerFlyAnimation(product.image, startCoord);
+    // Trigger Fly-to-Cart Framer Motion animation with flavor-specific image if present
+    triggerFlyAnimation(flavorImage || product.image, startCoord);
 
     setItems((prevItems) => {
       const existing = prevItems.find((item) => item.id === uniqueId);
@@ -143,13 +146,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             quantity: qty,
             selectedSize: size,
             selectedWeight: weight,
-            price: product.price,
+            selectedFlavor: flavor,
+            selectedFlavorImage: flavorImage,
+            price: itemPrice,
           },
         ];
       }
     });
 
-    showToast(`Added ${product.name} to Bag`);
+    showToast(flavor ? `Added ${product.name} (${flavor}) to Bag` : `Added ${product.name} to Bag`);
   };
 
   const removeFromCart = (itemId: string) => {

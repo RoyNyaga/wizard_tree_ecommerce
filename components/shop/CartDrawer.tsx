@@ -109,8 +109,8 @@ export function CartDrawer() {
         notes: shippingForm.notes || undefined,
         items: items.map((item) => ({
           product_id: item.product.id && !item.product.id.startsWith('wt-') ? item.product.id : null,
-          product_name: `${item.product.name}${item.selectedWeight ? ` (${item.selectedWeight})` : ''}${item.selectedSize ? ` (${item.selectedSize})` : ''}`,
-          product_image: item.product.image || null,
+          product_name: `${item.product.name}${item.selectedFlavor ? ` (${item.selectedFlavor})` : ''}${item.selectedWeight ? ` (${item.selectedWeight})` : ''}${item.selectedSize ? ` (${item.selectedSize})` : ''}`,
+          product_image: item.selectedFlavorImage || item.product.image || null,
           unit_price: item.price,
           quantity: item.quantity,
           total_price: Number((item.price * item.quantity).toFixed(2)),
@@ -493,7 +493,7 @@ export function CartDrawer() {
                       {/* Image Thumbnail */}
                       <div className="relative w-20 h-20 rounded-lg overflow-hidden border border-white/10 bg-white/5 flex-shrink-0">
                         <Image
-                          src={item.product.image}
+                          src={item.selectedFlavorImage || item.product.image}
                           alt={item.product.name}
                           fill
                           className="object-cover"
@@ -516,7 +516,12 @@ export function CartDrawer() {
                         </div>
 
                         {/* Variant metadata */}
-                        <div className="flex items-center gap-2 mt-1 font-mono text-[11px] text-wizard-muted">
+                        <div className="flex flex-wrap items-center gap-2 mt-1 font-mono text-[11px] text-wizard-muted">
+                          {item.selectedFlavor && (
+                            <span className="rounded bg-purple-950/60 border border-purple-500/30 px-1.5 py-0.5 text-purple-300 font-bold">
+                              Flavour: {item.selectedFlavor}
+                            </span>
+                          )}
                           {item.selectedWeight && <span>Weight: {item.selectedWeight}</span>}
                           {item.selectedSize && <span>Size: {item.selectedSize}</span>}
                           {item.product.thc && (

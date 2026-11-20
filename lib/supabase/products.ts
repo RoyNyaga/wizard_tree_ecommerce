@@ -1,5 +1,6 @@
 import { supabase, WIZARD_TREE_COMPANY_ID } from './client';
 import { DbProductCategory } from './categories';
+import { VapeFlavor } from '@/types';
 
 export interface DbProduct {
   id: string;
@@ -8,7 +9,9 @@ export interface DbProduct {
   name: string;
   lineage?: string | null;
   description: string | null;
-  category: string; // Slug fallback (e.g. 'flower', 'seeds', 'other')
+  category: string; // Slug fallback (e.g. 'flower', 'seeds', 'other', 'vapes')
+  brand?: string | null;
+  flavors?: VapeFlavor[] | null;
   price: number;
   currency: string;
   quantity: number;

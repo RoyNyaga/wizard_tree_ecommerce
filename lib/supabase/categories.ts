@@ -13,6 +13,7 @@ export interface DbProductCategory {
 export const DEFAULT_CATEGORIES = [
   { name: 'Flower', slug: 'flower', description: 'Artisanal indoor craft flower jars' },
   { name: 'Seeds', slug: 'seeds', description: 'Authenticated breeder genetics & souvenir packs' },
+  { name: 'Vapes', slug: 'vapes', description: 'Branded hardware and multi-flavour vaporizers' },
   { name: 'Other', slug: 'other', description: 'Pre-rolls, hash holes, streetwear, and lifestyle accessories' },
 ];
 

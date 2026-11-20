@@ -1,9 +1,21 @@
-export type ProductCategory = 
-  | 'flower' 
-  | 'preroll' 
-  | 'seeds' 
-  | 'streetwear' 
-  | 'accessories';
+export type ProductCategory =
+  | 'flower'
+  | 'preroll'
+  | 'seeds'
+  | 'streetwear'
+  | 'accessories'
+  | 'vapes';
+
+export interface VapeFlavor {
+  id: string; // e.g. "flav-coffee"
+  name: string; // e.g. "Coffee", "Blue Razz Ice"
+  image: string; // Specific product photo for this flavour
+  color: string; // Primary hex or gradient e.g. "#8B4513"
+  secondaryColor?: string; // e.g. "#D2691E" for dual-tone dots
+  price?: number; // Optional price override (defaults to product base price)
+  stockStatus: 'in_stock' | 'sold_out';
+  puffs?: string; // e.g. "30000"
+}
 
 export type StrainType = 'indica' | 'sativa' | 'hybrid' | 'indica-dominant' | 'sativa-dominant';
 
@@ -61,18 +73,22 @@ export interface Product {
   weights?: string[]; // 3.5g, 7g, 14g, 28g
   stockStatus: 'in_stock' | 'low_stock' | 'sold_out' | 'coming_soon';
   badge?: string; // "EXCLUSIVE DROP", "AWARD WINNER", "LIMITED"
+  brand?: string; // e.g. "Elf Bar", "Lost Mary"
+  flavors?: VapeFlavor[]; // Populated when category === 'vapes'
   isFeatured?: boolean;
   isNewDrop?: boolean;
   createdAt: string;
 }
 
 export interface CartItem {
-  id: string; // product.id + '-' + (variant || size || weight || 'default')
+  id: string; // product.id + '-' + (variant || size || weight || flavor || 'default')
   product: Product;
   quantity: number;
   selectedVariant?: string;
   selectedSize?: string;
   selectedWeight?: string;
+  selectedFlavor?: string; // Flavor name e.g. "Coffee"
+  selectedFlavorImage?: string; // Specific flavor photo
   price: number;
 }
 
