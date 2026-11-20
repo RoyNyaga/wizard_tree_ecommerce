@@ -13,7 +13,8 @@ export interface VapeFlavor {
   color: string; // Primary hex or gradient e.g. "#8B4513"
   secondaryColor?: string; // e.g. "#D2691E" for dual-tone dots
   price?: number; // Optional price override (defaults to product base price)
-  stockStatus: 'in_stock' | 'sold_out';
+  inStock?: boolean; // In stock status toggle
+  stockStatus?: 'in_stock' | 'sold_out';
   puffs?: string; // e.g. "30000"
 }
 
