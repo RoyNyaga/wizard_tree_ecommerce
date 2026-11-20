@@ -97,10 +97,13 @@ export default function CollectionCategoryPage() {
   });
 
   // Combine Supabase live items with mock fallback catalog deduplicated by ID
+  // Note: vape products are excluded from mock fallback — they must come from the DB only
   const allProducts = useMemo(() => {
     const liveItems = dbProducts.map(mapDbProductToProduct);
     const liveIds = new Set(liveItems.map((p) => p.id.toLowerCase()));
-    const extraMocks = PRODUCTS_DATA.filter((p) => !liveIds.has(p.id.toLowerCase()));
+    const extraMocks = PRODUCTS_DATA.filter(
+      (p) => !liveIds.has(p.id.toLowerCase()) && p.category !== 'vapes'
+    );
     return [...liveItems, ...extraMocks];
   }, [dbProducts]);
 

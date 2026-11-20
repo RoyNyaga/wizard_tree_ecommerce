@@ -36,16 +36,31 @@ import {
 } from 'lucide-react';
 
 const FLAVOR_COLOR_PRESETS = [
+  { name: 'Blackberry Ice', primary: '#512DA8', secondary: '#00BCD4' },
+  { name: 'Blue Razz Ice', primary: '#1976D2', secondary: '#00E5FF' },
+  { name: 'Blueberry Ice', primary: '#0D47A1', secondary: '#40C4FF' },
   { name: 'Coffee', primary: '#795548', secondary: '#D7CCC8' },
-  { name: 'Blue Razz', primary: '#1976D2', secondary: '#00E5FF' },
-  { name: 'Blackberry', primary: '#512DA8', secondary: '#00BCD4' },
-  { name: 'Apple', primary: '#7CB342', secondary: '#CDDC39' },
-  { name: 'Watermelon', primary: '#E91E63', secondary: '#00E676' },
-  { name: 'Miami Mint', primary: '#009688', secondary: '#80E27E' },
-  { name: 'Grape Ice', primary: '#7B1FA2', secondary: '#E1BEE7' },
-  { name: 'Peach Mango', primary: '#FF6F00', secondary: '#FFD54F' },
-  { name: 'Strawberry', primary: '#E53935', secondary: '#43A047' },
   { name: 'Cola Ice', primary: '#4E342E', secondary: '#A1887F' },
+  { name: 'Grape Ice', primary: '#7B1FA2', secondary: '#E1BEE7' },
+  { name: 'Lush Ice', primary: '#00897B', secondary: '#80CBC4' },
+  { name: 'Lychee Juicy Peach', primary: '#E91E63', secondary: '#FFB74D' },
+  { name: 'Miami Mint', primary: '#009688', secondary: '#80E27E' },
+  { name: 'Peach Mango Watermelon', primary: '#FF6F00', secondary: '#FFD54F' },
+  { name: 'Sour Apple', primary: '#7CB342', secondary: '#CDDC39' },
+  { name: 'Strawberry Kiwi Ice', primary: '#E53935', secondary: '#43A047' },
+  { name: 'Watermelon Ice', primary: '#E91E63', secondary: '#00E676' },
+  // Additional common vape flavours
+  { name: 'Blue Mint', primary: '#0288D1', secondary: '#26A69A' },
+  { name: 'Mango Ice', primary: '#FB8C00', secondary: '#FFF176' },
+  { name: 'Raspberry Ice', primary: '#C62828', secondary: '#F48FB1' },
+  { name: 'Passion Fruit', primary: '#AD1457', secondary: '#FF8F00' },
+  { name: 'Pineapple Ice', primary: '#F9A825', secondary: '#AED581' },
+  { name: 'Strawberry Ice', primary: '#D32F2F', secondary: '#F8BBD0' },
+  { name: 'Vanilla Custard', primary: '#F9A825', secondary: '#FFF9C4' },
+  { name: 'Mixed Berries', primary: '#6A1B9A', secondary: '#E91E63' },
+  { name: 'Tropical Punch', primary: '#FF6F00', secondary: '#E91E63' },
+  { name: 'Menthol', primary: '#00695C', secondary: '#B2EBF2' },
+  { name: 'Cherry Ice', primary: '#B71C1C', secondary: '#CE93D8' },
 ];
 
 export default function AdminProductsPage() {
@@ -792,8 +807,8 @@ export default function AdminProductsPage() {
                                 });
                               }}
                               className={`px-3 py-1.5 rounded-lg font-mono text-xs font-bold uppercase tracking-wider border transition ${flv.inStock !== false
-                                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                                  : 'bg-red-950/60 border-red-500/40 text-red-300'
+                                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+                                : 'bg-red-950/60 border-red-500/40 text-red-300'
                                 }`}
                             >
                               {flv.inStock !== false ? 'In Stock' : 'Sold Out'}
@@ -1085,8 +1100,8 @@ export default function AdminProductsPage() {
                           </div>
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${flv.inStock !== false
-                                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
-                                : 'bg-red-950/60 text-red-400 border border-red-500/30'
+                              ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
+                              : 'bg-red-950/60 text-red-400 border border-red-500/30'
                               }`}
                           >
                             {flv.inStock !== false ? 'In Stock' : 'Sold Out'}
