@@ -3,6 +3,7 @@ import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { DiscoverFlower } from '@/components/home/DiscoverFlower';
 import { SeedsSection } from '@/components/home/SeedsSection';
 import { OtherSection } from '@/components/home/OtherSection';
+import { VapesSection } from '@/components/home/VapesSection';
 import { WeAreWizardTrees } from '@/components/home/WeAreWizardTrees';
 import { CultivationVideo } from '@/components/home/CultivationVideo';
 import { FooterSection } from '@/components/home/FooterSection';
@@ -22,13 +23,16 @@ export default function HomePage() {
       {/* 04 // Other Banner */}
       <OtherSection />
 
-      {/* 05 // We Are Wizard Trees Banner */}
+      {/* 05 // Vapes Banner */}
+      <VapesSection />
+
+      {/* 06 // We Are Wizard Trees Banner */}
       <WeAreWizardTrees />
 
-      {/* 06 // Cultivation Video Banner */}
+      {/* 07 // Cultivation Video Banner */}
       <CultivationVideo />
 
-      {/* 07 // Final Section: Telegram Announcement & Email Subscription */}
+      {/* 08 // Final Section: Telegram Announcement & Email Subscription */}
       <FooterSection />
     </div>
   );
