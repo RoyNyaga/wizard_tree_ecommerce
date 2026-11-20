@@ -218,6 +218,7 @@ export default function AdminProductsPage() {
       name: `Flavour ${formData.flavors.length + 1}`,
       image: formData.images[0] || '/images/wizard_trees_photo.png',
       inStock: true,
+      stockStatus: 'in_stock',
       color: '#795548',
       secondaryColor: '#D7CCC8',
       price: formData.price,
@@ -783,9 +784,13 @@ export default function AdminProductsPage() {
                             </label>
                             <button
                               type="button"
-                              onClick={() =>
-                                handleUpdateFlavor(idx, { inStock: flv.inStock === false ? true : false })
-                              }
+                              onClick={() => {
+                                const nextInStock = flv.inStock === false;
+                                handleUpdateFlavor(idx, {
+                                  inStock: nextInStock,
+                                  stockStatus: nextInStock ? 'in_stock' : 'sold_out',
+                                });
+                              }}
                               className={`px-3 py-1.5 rounded-lg font-mono text-xs font-bold uppercase tracking-wider border transition ${flv.inStock !== false
                                   ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
                                   : 'bg-red-950/60 border-red-500/40 text-red-300'
