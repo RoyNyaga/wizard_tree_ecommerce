@@ -32,11 +32,15 @@ export function CollectionProductCard({
     e.stopPropagation();
     const defaultWeight = product.weights?.[0];
     const defaultSize = product.sizes?.[0];
+    const defaultFlavor = product.flavors?.[0];
     addToCart(
       product,
       {
         weight: defaultWeight,
         size: defaultSize,
+        flavor: defaultFlavor?.name,
+        flavorImage: defaultFlavor?.image,
+        price: defaultFlavor?.price || product.price,
         quantity: 1,
       },
       { x: e.clientX, y: e.clientY }
@@ -109,6 +113,13 @@ export function CollectionProductCard({
 
       {/* Product Metadata & Pricing (formatted according to Annotation screenshot) */}
       <div className="mt-3 flex flex-col">
+        {/* Brand Tag if present */}
+        {product.brand && (
+          <span className="text-[10px] font-mono uppercase tracking-widest text-sky-400 font-bold mb-0.5">
+            {product.brand}
+          </span>
+        )}
+
         {/* Title & Lineage line */}
         <h3 className="text-[13px] sm:text-sm font-medium text-white/95 leading-snug line-clamp-2 group-hover:text-purple-200 transition-colors">
           {product.name}
@@ -116,6 +127,29 @@ export function CollectionProductCard({
             <span className="font-normal text-white/80"> Lineage: {product.lineage}</span>
           ) : null}
         </h3>
+
+        {/* Flavour swatches preview if vapes product */}
+        {product.flavors && product.flavors.length > 0 && (
+          <div className="mt-1 flex items-center gap-1.5">
+            <div className="flex -space-x-1 overflow-hidden py-0.5">
+              {product.flavors.slice(0, 5).map((flv, idx) => (
+                <span
+                  key={flv.id || idx}
+                  className="inline-block w-2.5 h-2.5 rounded-full ring-1 ring-black shadow-sm"
+                  style={{
+                    background: flv.secondaryColor
+                      ? `linear-gradient(135deg, ${flv.color || '#fff'} 50%, ${flv.secondaryColor} 50%)`
+                      : (flv.color || '#fff')
+                  }}
+                  title={flv.name}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] font-mono text-white/50">
+              {product.flavors.length} flavours
+            </span>
+          </div>
+        )}
 
         {/* 5 Gold Stars Rating */}
         <div className="flex items-center gap-0.5 mt-1 text-amber-400" aria-label="5 star rating">

@@ -27,6 +27,7 @@ function mapDbProductToProduct(db: DbProduct): Product {
     id: db.id,
     slug: db.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
     name: db.name,
+    brand: db.brand || undefined,
     subtitle: db.lineage || `${catName} // CRAFT`,
     lineage: db.lineage || undefined,
     category: (catSlug as ProductCategory) || 'flower',
@@ -37,6 +38,7 @@ function mapDbProductToProduct(db: DbProduct): Product {
     stockStatus: db.quantity <= 0 ? 'sold_out' : db.quantity <= 5 ? 'low_stock' : 'in_stock',
     badge: db.availability ? 'AVAILABLE' : 'ARCHIVED',
     createdAt: db.created_at,
+    flavors: db.flavors || undefined,
   };
 }
 
@@ -48,6 +50,14 @@ const CATEGORY_TITLES: Record<string, { title: string; subtitle: string }> = {
   seeds: {
     title: 'SEEDS',
     subtitle: 'OFFICIAL WIZARD TREES GENETICS',
+  },
+  vapes: {
+    title: 'VAPES',
+    subtitle: 'PREMIUM BRANDED HARDWARE & FLAVOURS',
+  },
+  vape: {
+    title: 'VAPES',
+    subtitle: 'PREMIUM BRANDED HARDWARE & FLAVOURS',
   },
   other: {
     title: 'OTHER',
@@ -86,9 +96,12 @@ export default function CollectionCategoryPage() {
     queryFn: () => fetchCompanyProducts({ status: 'published' }),
   });
 
-  // Display only real products gotten directly from Supabase
+  // Combine Supabase live items with mock fallback catalog deduplicated by ID
   const allProducts = useMemo(() => {
-    return dbProducts.map(mapDbProductToProduct);
+    const liveItems = dbProducts.map(mapDbProductToProduct);
+    const liveIds = new Set(liveItems.map((p) => p.id.toLowerCase()));
+    const extraMocks = PRODUCTS_DATA.filter((p) => !liveIds.has(p.id.toLowerCase()));
+    return [...liveItems, ...extraMocks];
   }, [dbProducts]);
 
   // Determine header texts
@@ -120,6 +133,9 @@ export default function CollectionCategoryPage() {
       }
       if (categoryParam === 'seeds') {
         return pCat === 'seeds' || pCat === 'seed';
+      }
+      if (categoryParam === 'vapes' || categoryParam === 'vape') {
+        return pCat === 'vapes' || pCat === 'vape';
       }
       if (categoryParam === 'other' || categoryParam === 'others') {
         return (
@@ -338,8 +354,8 @@ export default function CollectionCategoryPage() {
         {isLoading ? (
           <div
             className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${gridCols === 4
-                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+              ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
               }`}
           >
             {[...Array(gridCols === 4 ? 8 : 10)].map((_, i) => (
@@ -349,8 +365,8 @@ export default function CollectionCategoryPage() {
         ) : processedProducts.length > 0 ? (
           <div
             className={`mt-8 sm:mt-10 grid gap-x-6 sm:gap-x-7 gap-y-12 sm:gap-y-14 ${gridCols === 4
-                ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+              ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
               }`}
           >
             {processedProducts.map((product) => (

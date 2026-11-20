@@ -9,6 +9,7 @@ import { Product, ProductCategory } from '@/types';
 import { PRODUCTS_DATA } from '@/lib/mockData';
 import { fetchCompanyProducts, DbProduct } from '@/lib/supabase/products';
 import { CollectionProductCard } from '@/components/shop/CollectionProductCard';
+import { useCart } from '@/context/CartContext';
 import {
   Star,
   ArrowLeft,
@@ -18,6 +19,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Dna,
+  Check,
+  Minus,
+  Plus,
 } from 'lucide-react';
 
 function mapDbProductToProduct(db: DbProduct): Product {
@@ -39,6 +43,7 @@ function mapDbProductToProduct(db: DbProduct): Product {
     id: db.id,
     slug: db.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
     name: db.name,
+    brand: db.brand || undefined,
     subtitle: db.lineage || `${catName} // LA CRAFT`,
     lineage: db.lineage || undefined,
     category: (catSlug as ProductCategory) || 'flower',
@@ -49,6 +54,7 @@ function mapDbProductToProduct(db: DbProduct): Product {
     stockStatus: db.quantity <= 0 ? 'sold_out' : db.quantity <= 5 ? 'low_stock' : 'in_stock',
     badge: db.availability ? 'AVAILABLE' : 'ARCHIVED',
     createdAt: db.created_at,
+    flavors: db.flavors || undefined,
   };
 }
 
@@ -56,9 +62,14 @@ export default function ProductShowPage() {
   const params = useParams();
   const router = useRouter();
   const rawId = (params?.id as string) || '';
+  const { addToCart } = useCart();
 
   // State for active image lightbox or preview
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+  // Vape specific state
+  const [selectedFlavorIndex, setSelectedFlavorIndex] = useState(0);
+  const [vapeQuantity, setVapeQuantity] = useState(1);
 
   // Fetch all published products from Supabase
   const { data: dbProducts = [], isLoading } = useQuery({
@@ -83,6 +94,22 @@ export default function ProductShowPage() {
       allProductsList: combined,
     };
   }, [dbProducts, rawId]);
+
+  // Check if current product belongs to vapes category or has flavours configured
+  const isVapeProduct = useMemo(() => {
+    if (!currentProduct) return false;
+    const cat = currentProduct.category?.toLowerCase();
+    return (
+      cat === 'vapes' ||
+      cat === 'vape' ||
+      Boolean(currentProduct.flavors && currentProduct.flavors.length > 0)
+    );
+  }, [currentProduct]);
+
+  const activeFlavors = currentProduct?.flavors || [];
+  const activeFlavor = activeFlavors[selectedFlavorIndex] || activeFlavors[0] || null;
+  const activeFlavorPrice = activeFlavor?.price ?? currentProduct?.price ?? 0;
+  const inStockCount = activeFlavors.filter((f) => f.inStock !== false).length;
 
   // Extract images array
   const images = useMemo(() => {
@@ -216,175 +243,408 @@ export default function ProductShowPage() {
       </div>
 
       {/* ============================================================ */}
-      {/* SECTION 1: PRODUCT IN CONTEXT (Matching Annotation Spec)     */}
+      {/* SECTION 1: PRODUCT SHOWCASE                                  */}
       {/* ============================================================ */}
-      <section className="max-w-[1480px] mx-auto px-4 sm:px-8 lg:px-12 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
-          {/* ======================================================== */}
-          {/* LEFT COLUMN: PHOTOS GALLERY                               */}
-          {/* If 4 photos: 2x2 grid.                                    */}
-          {/* If 1 photo: centralized, taking whole space as requested. */}
-          {/* ======================================================== */}
-          <div className="lg:col-span-7 w-full">
-            {images.length === 1 ? (
-              /* Single Photo: Centralized and taking full space */
-              <div className="relative w-full aspect-square sm:aspect-[4/5] max-h-[720px] rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center p-6 sm:p-12 overflow-hidden shadow-2xl">
-                <div className="relative w-full h-full max-w-[540px]">
+      {isVapeProduct ? (
+        /* VAPES BRAND & FLAVOUR SHOWCASE (Matching User Reference Image) */
+        <section className="max-w-[1480px] mx-auto px-4 sm:px-8 lg:px-12 pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+            {/* LEFT COLUMN: HERO FLAVOUR PHOTO + THUMBNAILS STRIP */}
+            <div className="lg:col-span-7 w-full flex flex-col">
+              {/* Big Hero Card */}
+              <div className="relative w-full aspect-square max-h-[640px] rounded-3xl bg-[#14100e] border border-white/10 flex items-center justify-center p-6 sm:p-12 overflow-hidden shadow-2xl">
+                {/* Flavour Name in top-left */}
+                <div className="absolute top-6 left-6 z-10">
+                  <span className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-wider text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
+                    {activeFlavor?.name || currentProduct.name}
+                  </span>
+                </div>
+
+                {/* Device puffs badge in bottom-right (matching reference) */}
+                <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end">
+                  <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] flex items-baseline gap-1">
+                    <span>30</span>
+                    <span className="text-sm font-bold tracking-normal border border-white/40 px-1 py-0.5 rounded leading-none">
+                      PUFFS
+                    </span>
+                  </div>
+                </div>
+
+                {/* Central Device Photo */}
+                <div className="relative w-full h-full max-w-[480px]">
                   <Image
-                    src={images[0]}
-                    alt={currentProduct.name}
+                    key={activeFlavor?.image || images[0]}
+                    src={activeFlavor?.image || images[0] || '/images/wizard_trees_photo.png'}
+                    alt={activeFlavor?.name || currentProduct.name}
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 55vw"
-                    className="object-contain object-center transition-transform duration-500 hover:scale-105 drop-shadow-2xl"
+                    className="object-contain object-center transition-all duration-300 drop-shadow-[0_20px_35px_rgba(0,0,0,0.8)]"
                   />
                 </div>
               </div>
-            ) : images.length === 4 ? (
-              /* 4 Photos: 2x2 Grid exactly as shown in reference */
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
-                {images.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    className="relative aspect-square w-full rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 border border-white/10 shadow-lg group"
-                  >
-                    <Image
-                      src={imgUrl}
-                      alt={`${currentProduct.name} - view ${idx + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 30vw"
-                      className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              /* Other photo counts: dynamic responsive multi-image layout */
-              <div
-                className={`grid gap-3 sm:gap-4 w-full ${images.length === 2
-                  ? 'grid-cols-2'
-                  : 'grid-cols-2 sm:grid-cols-3'
-                  }`}
-              >
-                {images.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    className={`relative aspect-square w-full rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 border border-white/10 shadow-lg group ${images.length === 3 && idx === 0
-                      ? 'col-span-2 aspect-[16/10]'
-                      : ''
-                      }`}
-                  >
-                    <Image
-                      src={imgUrl}
-                      alt={`${currentProduct.name} - view ${idx + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 30vw"
-                      className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* ======================================================== */}
-          {/* RIGHT COLUMN: PRODUCT INFO & TELEGRAM ACTION              */}
-          {/* ======================================================== */}
-          <div className="lg:col-span-5 flex flex-col justify-start">
-            {/* Brand / Category Tag */}
-            <p className="text-xs sm:text-sm font-bold tracking-[0.22em] uppercase text-white/70 font-sans">
-              WIZARD TREES {currentProduct.category.toUpperCase()}
-            </p>
-
-            {/* Product Title */}
-            <h1 className="mt-1 text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-white tracking-tight leading-tight">
-              {currentProduct.name}
-            </h1>
-
-            {/* 5-Star Rating */}
-            <div className="mt-2.5 flex items-center gap-1 text-amber-400" aria-label="5 stars rating">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-              ))}
+              {/* Horizontal thumbnail strip of all flavours */}
+              {activeFlavors.length > 0 && (
+                <div className="mt-4 flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/20">
+                  {activeFlavors.map((flv, idx) => {
+                    const isSelected = selectedFlavorIndex === idx;
+                    return (
+                      <button
+                        key={flv.id || idx}
+                        onClick={() => setSelectedFlavorIndex(idx)}
+                        className={`group/thumb relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-200 bg-black/50 ${isSelected
+                            ? 'border-white scale-105 shadow-xl ring-2 ring-white/20 z-10'
+                            : 'border-white/10 opacity-70 hover:opacity-100 hover:border-white/40'
+                          }`}
+                      >
+                        <Image
+                          src={flv.image || currentProduct.image}
+                          alt={flv.name}
+                          fill
+                          className="object-cover"
+                        />
+                        <span className="absolute inset-x-0 bottom-0 bg-black/80 py-0.5 text-[8px] text-center text-white truncate px-0.5 font-bold">
+                          {flv.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Price */}
-            <div className="mt-3 flex items-baseline gap-3">
-              <span className="text-xl sm:text-2xl font-bold text-white font-sans">
-                ${currentProduct.price.toFixed(2)}
-              </span>
-              {currentProduct.compareAtPrice && (
-                <span className="text-sm sm:text-base text-white/40 line-through">
-                  ${currentProduct.compareAtPrice.toFixed(2)}
+            {/* RIGHT COLUMN: BRAND, MODEL, FLAVOUR PILLS & ADD TO CART */}
+            <div className="lg:col-span-5 flex flex-col justify-start">
+              {/* Brand Header */}
+              {currentProduct.brand && (
+                <p className="text-xs sm:text-sm font-mono uppercase tracking-[0.25em] text-sky-400 font-bold">
+                  {currentProduct.brand}
+                </p>
+              )}
+
+              {/* Model Title */}
+              <h1 className="mt-1 text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                {currentProduct.brand ? `${currentProduct.brand} ${currentProduct.name}` : currentProduct.name}
+              </h1>
+
+              {/* Price */}
+              <div className="mt-2.5 flex items-baseline gap-3">
+                <span className="text-2xl sm:text-3xl font-extrabold text-white font-sans">
+                  ${activeFlavorPrice.toFixed(2)}
                 </span>
+                {currentProduct.compareAtPrice && (
+                  <span className="text-base text-white/40 line-through">
+                    ${currentProduct.compareAtPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {/* Flavour Selection Grid */}
+              {activeFlavors.length > 0 && (
+                <div className="mt-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-bold text-white tracking-wide">
+                      Flavour
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
+                    {activeFlavors.map((flv, idx) => {
+                      const isSelected = selectedFlavorIndex === idx;
+                      const isAvailable = flv.inStock !== false;
+                      return (
+                        <button
+                          key={flv.id || idx}
+                          onClick={() => setSelectedFlavorIndex(idx)}
+                          disabled={!isAvailable}
+                          className={`flex items-center justify-between gap-2.5 px-3.5 py-3 rounded-2xl border transition-all text-left ${isSelected
+                              ? 'border-sky-500 bg-sky-500/10 text-white font-semibold ring-1 ring-sky-500/40 shadow-md'
+                              : 'border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.08] hover:border-white/20'
+                            } ${!isAvailable ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {/* Dual-tone taste color dot */}
+                            <span
+                              className="w-4 h-4 rounded-full flex-shrink-0 shadow-sm border border-black/30"
+                              style={{
+                                background: flv.secondaryColor
+                                  ? `linear-gradient(135deg, ${flv.color || '#fff'} 50%, ${flv.secondaryColor} 50%)`
+                                  : (flv.color || '#fff')
+                              }}
+                            />
+                            <span className="text-xs sm:text-[13px] truncate">
+                              {flv.name}
+                            </span>
+                          </div>
+
+                          {isSelected && (
+                            <Check className="w-4 h-4 text-sky-400 stroke-[2.5] flex-shrink-0" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Stock counter */}
+                  <div className="mt-3.5 text-xs font-mono text-white/60 space-y-0.5">
+                    <p>{inStockCount} of {activeFlavors.length} flavours in stock</p>
+                    <p className="text-white/90">
+                      {activeFlavor ? `${activeFlavor.name} — $${activeFlavorPrice.toFixed(2)}, in stock.` : 'Select a flavour'}
+                    </p>
+                  </div>
+
+                  {/* Clear selection */}
+                  <button
+                    onClick={() => setSelectedFlavorIndex(0)}
+                    className="mt-2 text-[11px] font-mono uppercase tracking-widest text-white/40 hover:text-white transition"
+                  >
+                    CLEAR
+                  </button>
+                </div>
               )}
+
+              {/* Hairline Divider */}
+              <div className="my-6 border-t border-white/10" />
+
+              {/* Stepper + Add to Cart Button */}
+              <div className="flex items-center gap-3">
+                {/* Stepper */}
+                <div className="flex items-center rounded-xl border border-white/20 bg-white/5 p-1">
+                  <button
+                    onClick={() => setVapeQuantity((q) => Math.max(1, q - 1))}
+                    className="p-2 text-white/70 hover:text-white transition rounded-lg hover:bg-white/10"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="w-8 text-center font-mono font-bold text-sm text-white">
+                    {vapeQuantity}
+                  </span>
+                  <button
+                    onClick={() => setVapeQuantity((q) => q + 1)}
+                    className="p-2 text-white/70 hover:text-white transition rounded-lg hover:bg-white/10"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* Add to cart button */}
+                <button
+                  onClick={(e) => {
+                    addToCart(
+                      currentProduct,
+                      {
+                        flavor: activeFlavor?.name,
+                        flavorImage: activeFlavor?.image,
+                        price: activeFlavorPrice,
+                        quantity: vapeQuantity,
+                      },
+                      { x: e.clientX, y: e.clientY }
+                    );
+                  }}
+                  disabled={activeFlavor?.inStock === false}
+                  className="flex-1 rounded-xl bg-[#0070f3] hover:bg-[#0060df] text-white py-3.5 px-6 font-bold text-sm tracking-wide uppercase transition-all duration-200 active:scale-[0.99] shadow-xl disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  {activeFlavor?.inStock === false ? 'Out of Stock' : 'Add to cart'}
+                </button>
+              </div>
+
+              {/* Telegram Discreet Order Link */}
+              <div className="mt-3">
+                <a
+                  href="https://t.me/Wizardtreesmessage"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-mono text-xs uppercase tracking-wider transition"
+                >
+                  <span>Shop now on Telegram</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-white/60" />
+                </a>
+              </div>
+
+              {/* Description & Specs */}
+              <div className="mt-8 space-y-4">
+                <h3 className="text-sm font-mono uppercase tracking-widest text-white/60 font-bold">
+                  Hardware Specifications
+                </h3>
+                <div className="space-y-3 text-sm text-white/80 leading-relaxed font-sans">
+                  {descriptionParagraphs.map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </div>
+
+                {bulletPoints.length > 0 && (
+                  <ul className="space-y-2 text-xs sm:text-sm text-white/85 font-sans pt-2 border-t border-white/10">
+                    {bulletPoints.map((bullet, i) => (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-sky-400 font-bold select-none">•</span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-
-            {/* Shop Now Button -> Redirects to Telegram Link (Opens in same tab) */}
-            <div className="mt-6">
-              <a
-                href="https://t.me/Wizardtreesmessage"
-                className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white font-sans font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-[0.99] shadow-xl hover:border-white/40"
-              >
-                <span>Shop now</span>
-                <ExternalLink className="w-4 h-4 text-white/70" />
-              </a>
-              <p className="mt-2 text-center text-[11px] text-white/50 font-sans">
-                Secure orders and discreet inquiries handled directly on Telegram.
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="my-8 border-t border-white/10" />
-
-            {/* Secondary Headline (Lineage or Strain Name in Bold Caps) */}
-            <h2 className="text-xl sm:text-2xl lg:text-[26px] font-black uppercase tracking-tight text-white font-sans">
-              {currentProduct.lineage
-                ? currentProduct.lineage
-                : currentProduct.name}
-            </h2>
-
-            {/* Paragraph Description */}
-            <div className="mt-4 space-y-3 text-sm sm:text-[15px] leading-relaxed text-white/80 font-sans">
-              {descriptionParagraphs.length > 0 ? (
-                descriptionParagraphs.map((para, i) => <p key={i}>{para}</p>)
+          </div>
+        </section>
+      ) : (
+        /* CLASSIC FLOWER & CONCENTRATES SHOWCASE */
+        <section className="max-w-[1480px] mx-auto px-4 sm:px-8 lg:px-12 pb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+            {/* LEFT COLUMN: PHOTOS GALLERY */}
+            <div className="lg:col-span-7 w-full">
+              {images.length === 1 ? (
+                /* Single Photo */
+                <div className="relative w-full aspect-square sm:aspect-[4/5] max-h-[720px] rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center p-6 sm:p-12 overflow-hidden shadow-2xl">
+                  <div className="relative w-full h-full max-w-[540px]">
+                    <Image
+                      src={images[0]}
+                      alt={currentProduct.name}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 55vw"
+                      className="object-contain object-center transition-transform duration-500 hover:scale-105 drop-shadow-2xl"
+                    />
+                  </div>
+                </div>
+              ) : images.length === 4 ? (
+                /* 4 Photos: 2x2 Grid */
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
+                  {images.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      className="relative aspect-square w-full rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 border border-white/10 shadow-lg group"
+                    >
+                      <Image
+                        src={imgUrl}
+                        alt={`${currentProduct.name} - view ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 30vw"
+                        className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
               ) : (
-                <p>{currentProduct.description}</p>
+                /* Dynamic multi-image layout */
+                <div
+                  className={`grid gap-3 sm:gap-4 w-full ${images.length === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'
+                    }`}
+                >
+                  {images.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      className={`relative aspect-square w-full rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 border border-white/10 shadow-lg group ${images.length === 3 && idx === 0 ? 'col-span-2 aspect-[16/10]' : ''
+                        }`}
+                    >
+                      <Image
+                        src={imgUrl}
+                        alt={`${currentProduct.name} - view ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 50vw, 30vw"
+                        className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
 
-            {/* Bulleted Specifications (Matching Reference Screenshot) */}
-            {bulletPoints.length > 0 && (
-              <div className="mt-6 pt-6 border-t border-white/[0.08]">
-                <ul className="space-y-2 text-xs sm:text-sm text-white/85 font-sans leading-relaxed">
-                  {bulletPoints.map((bullet, i) => {
-                    const colonIdx = bullet.indexOf(':');
-                    if (colonIdx !== -1) {
-                      const label = bullet.slice(0, colonIdx);
-                      const val = bullet.slice(colonIdx + 1);
+            {/* RIGHT COLUMN: PRODUCT INFO & TELEGRAM ACTION */}
+            <div className="lg:col-span-5 flex flex-col justify-start">
+              {/* Brand / Category Tag */}
+              <p className="text-xs sm:text-sm font-bold tracking-[0.22em] uppercase text-white/70 font-sans">
+                WIZARD TREES {currentProduct.category.toUpperCase()}
+              </p>
+
+              {/* Product Title */}
+              <h1 className="mt-1 text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-white tracking-tight leading-tight">
+                {currentProduct.name}
+              </h1>
+
+              {/* 5-Star Rating */}
+              <div className="mt-2.5 flex items-center gap-1 text-amber-400" aria-label="5 stars rating">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                ))}
+              </div>
+
+              {/* Price */}
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="text-xl sm:text-2xl font-bold text-white font-sans">
+                  ${currentProduct.price.toFixed(2)}
+                </span>
+                {currentProduct.compareAtPrice && (
+                  <span className="text-sm sm:text-base text-white/40 line-through">
+                    ${currentProduct.compareAtPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              {/* Shop Now Button -> Redirects to Telegram Link (Opens in same tab) */}
+              <div className="mt-6">
+                <a
+                  href="https://t.me/Wizardtreesmessage"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-lg bg-black hover:bg-neutral-900 border border-white/20 text-white font-sans font-bold text-sm tracking-wider uppercase transition-all duration-200 active:scale-[0.99] shadow-xl hover:border-white/40"
+                >
+                  <span>Shop now</span>
+                  <ExternalLink className="w-4 h-4 text-white/70" />
+                </a>
+                <p className="mt-2 text-center text-[11px] text-white/50 font-sans">
+                  Secure orders and discreet inquiries handled directly on Telegram.
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="my-8 border-t border-white/10" />
+
+              {/* Secondary Headline (Lineage or Strain Name in Bold Caps) */}
+              <h2 className="text-xl sm:text-2xl lg:text-[26px] font-black uppercase tracking-tight text-white font-sans">
+                {currentProduct.lineage ? currentProduct.lineage : currentProduct.name}
+              </h2>
+
+              {/* Paragraph Description */}
+              <div className="mt-4 space-y-3 text-sm sm:text-[15px] leading-relaxed text-white/80 font-sans">
+                {descriptionParagraphs.length > 0 ? (
+                  descriptionParagraphs.map((para, i) => <p key={i}>{para}</p>)
+                ) : (
+                  <p>{currentProduct.description}</p>
+                )}
+              </div>
+
+              {/* Bulleted Specifications (Matching Reference Screenshot) */}
+              {bulletPoints.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-white/[0.08]">
+                  <ul className="space-y-2 text-xs sm:text-sm text-white/85 font-sans leading-relaxed">
+                    {bulletPoints.map((bullet, i) => {
+                      const colonIdx = bullet.indexOf(':');
+                      if (colonIdx !== -1) {
+                        const label = bullet.slice(0, colonIdx);
+                        const val = bullet.slice(colonIdx + 1);
+                        return (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="text-purple-400 font-bold select-none">•</span>
+                            <span>
+                              <strong className="text-white font-semibold">{label}:</strong>
+                              <span className="text-white/80">{val}</span>
+                            </span>
+                          </li>
+                        );
+                      }
                       return (
                         <li key={i} className="flex items-start gap-2">
                           <span className="text-purple-400 font-bold select-none">•</span>
-                          <span>
-                            <strong className="text-white font-semibold">{label}:</strong>
-                            <span className="text-white/80">{val}</span>
-                          </span>
+                          <span>{bullet}</span>
                         </li>
                       );
-                    }
-                    return (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-purple-400 font-bold select-none">•</span>
-                        <span>{bullet}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ============================================================ */}
       {/* SECTION 2: RELATED PRODUCTS (You may also like)              */}

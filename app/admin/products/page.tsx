@@ -16,6 +16,7 @@ import {
 } from '@/lib/supabase/categories';
 import { uploadProductImage } from '@/lib/image-utils';
 import { ImageCropperModal } from '@/components/admin/ImageCropperModal';
+import { VapeFlavor } from '@/types';
 import {
   Plus,
   Search,
@@ -28,8 +29,24 @@ import {
   Tag,
   Dna,
   Eye,
-  CheckCircle2
+  CheckCircle2,
+  Palette,
+  Layers,
+  Check,
 } from 'lucide-react';
+
+const FLAVOR_COLOR_PRESETS = [
+  { name: 'Coffee', primary: '#795548', secondary: '#D7CCC8' },
+  { name: 'Blue Razz', primary: '#1976D2', secondary: '#00E5FF' },
+  { name: 'Blackberry', primary: '#512DA8', secondary: '#00BCD4' },
+  { name: 'Apple', primary: '#7CB342', secondary: '#CDDC39' },
+  { name: 'Watermelon', primary: '#E91E63', secondary: '#00E676' },
+  { name: 'Miami Mint', primary: '#009688', secondary: '#80E27E' },
+  { name: 'Grape Ice', primary: '#7B1FA2', secondary: '#E1BEE7' },
+  { name: 'Peach Mango', primary: '#FF6F00', secondary: '#FFD54F' },
+  { name: 'Strawberry', primary: '#E53935', secondary: '#43A047' },
+  { name: 'Cola Ice', primary: '#4E342E', secondary: '#A1887F' },
+];
 
 export default function AdminProductsPage() {
   const queryClient = useQueryClient();
@@ -46,10 +63,12 @@ export default function AdminProductsPage() {
 
   // Cropper states
   const [cropperFileSrc, setCropperFileSrc] = useState<string | null>(null);
+  const [flavorCropperIndex, setFlavorCropperIndex] = useState<number | null>(null);
 
   // Form input states
   const [formData, setFormData] = useState({
     name: '',
+    brand: '',
     lineage: '',
     category_id: null as string | null,
     category: 'flower',
@@ -59,6 +78,7 @@ export default function AdminProductsPage() {
     status: 'published' as 'draft' | 'published',
     description: '',
     images: [] as string[],
+    flavors: [] as VapeFlavor[],
   });
 
   // Query categories
@@ -104,6 +124,7 @@ export default function AdminProductsPage() {
     const firstCat = categories[0];
     setFormData({
       name: '',
+      brand: '',
       lineage: '',
       category_id: firstCat?.id || null,
       category: firstCat?.slug || 'flower',
@@ -113,7 +134,9 @@ export default function AdminProductsPage() {
       status: 'published',
       description: '',
       images: [],
+      flavors: [],
     });
+    setFlavorCropperIndex(null);
     setIsFormOpen(true);
   };
 
@@ -121,6 +144,7 @@ export default function AdminProductsPage() {
     setEditingProduct(prod);
     setFormData({
       name: prod.name,
+      brand: prod.brand || '',
       lineage: prod.lineage || '',
       category_id: prod.category_id || null,
       category: prod.category,
@@ -130,7 +154,9 @@ export default function AdminProductsPage() {
       status: prod.status,
       description: prod.description || '',
       images: prod.images || [],
+      flavors: (prod.flavors || []) as VapeFlavor[],
     });
+    setFlavorCropperIndex(null);
     setIsFormOpen(true);
   };
 
@@ -154,10 +180,24 @@ export default function AdminProductsPage() {
   const handleCropConfirm = async (compressedBlob: Blob) => {
     try {
       const publicUrl = await uploadProductImage(compressedBlob);
-      setFormData((prev) => ({
-        ...prev,
-        images: [...prev.images, publicUrl],
-      }));
+      if (flavorCropperIndex !== null) {
+        setFormData((prev) => {
+          const nextFlavors = [...prev.flavors];
+          if (nextFlavors[flavorCropperIndex]) {
+            nextFlavors[flavorCropperIndex] = {
+              ...nextFlavors[flavorCropperIndex],
+              image: publicUrl,
+            };
+          }
+          return { ...prev, flavors: nextFlavors };
+        });
+        setFlavorCropperIndex(null);
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          images: [...prev.images, publicUrl],
+        }));
+      }
       setCropperFileSrc(null);
     } catch (err: any) {
       alert(`Upload error: ${err.message}`);
@@ -171,18 +211,67 @@ export default function AdminProductsPage() {
     }));
   };
 
+  // Flavour management helpers
+  const handleAddFlavor = () => {
+    const newFlv: VapeFlavor = {
+      id: `flv-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      name: `Flavour ${formData.flavors.length + 1}`,
+      image: formData.images[0] || '/images/wizard_trees_photo.png',
+      inStock: true,
+      color: '#795548',
+      secondaryColor: '#D7CCC8',
+      price: formData.price,
+    };
+    setFormData((prev) => ({
+      ...prev,
+      flavors: [...prev.flavors, newFlv],
+    }));
+  };
+
+  const handleUpdateFlavor = (index: number, updates: Partial<VapeFlavor>) => {
+    setFormData((prev) => {
+      const next = [...prev.flavors];
+      next[index] = { ...next[index], ...updates };
+      return { ...prev, flavors: next };
+    });
+  };
+
+  const handleRemoveFlavor = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      flavors: prev.flavors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleFlavorFileSelect = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setFlavorCropperIndex(index);
+        setCropperFileSrc(reader.result?.toString() || null);
+      });
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name) return;
 
+    const payload = {
+      ...formData,
+      brand: formData.brand.trim() || null,
+      flavors: formData.flavors.length > 0 ? formData.flavors : null,
+    };
+
     if (editingProduct) {
       updateMutation.mutate({
         id: editingProduct.id,
-        input: formData,
+        input: payload,
       });
     } else {
       createMutation.mutate({
-        ...formData,
+        ...payload,
         availability: formData.quantity > 0,
         currency: 'USD',
       });
@@ -304,14 +393,24 @@ export default function AdminProductsPage() {
                           )}
                         </div>
                         <div>
+                          {prod.brand && (
+                            <span className="text-[10px] font-mono text-sky-400 font-bold uppercase tracking-wider block">
+                              {prod.brand}
+                            </span>
+                          )}
                           <p className="font-bold text-white text-sm">{prod.name}</p>
+                          {prod.flavors && prod.flavors.length > 0 && (
+                            <span className="inline-flex items-center gap-1 rounded bg-sky-950/60 border border-sky-500/30 px-1.5 py-0.5 text-[9px] font-mono text-sky-300 font-bold uppercase mt-0.5">
+                              {prod.flavors.length} flavours
+                            </span>
+                          )}
                           {prod.lineage && (
-                            <p className="text-[11px] text-purple-300 font-mono flex items-center gap-1">
+                            <p className="text-[11px] text-purple-300 font-mono flex items-center gap-1 mt-0.5">
                               <Dna className="w-3 h-3 text-wizard-purple-glow" />
                               <span>{prod.lineage}</span>
                             </p>
                           )}
-                          <p className="text-[11px] text-white/40 truncate max-w-xs">
+                          <p className="text-[11px] text-white/40 truncate max-w-xs mt-0.5">
                             {prod.description || 'No description'}
                           </p>
                         </div>
@@ -393,7 +492,7 @@ export default function AdminProductsPage() {
       {/* ======================================================== */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-          <div className="relative w-full max-w-2xl bg-[#0c0b14] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl my-8">
+          <div className="relative w-full max-w-4xl bg-[#0c0b14] border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl my-8">
             <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
               <h2 className="font-display font-bold text-lg uppercase text-white">
                 {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -414,20 +513,33 @@ export default function AdminProductsPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. ZOAP Craft Flower"
+                    placeholder="e.g. ZOAP Craft Flower or D3 Pro 30000"
                     className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white focus:outline-none focus:border-wizard-purple-glow"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-mono uppercase text-white/70 mb-1">
-                    Lineage / Genetics (Optional)
+                    Brand (For Vapes / Hardware)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    placeholder="e.g. Elf Bar, Geek Bar, Wizard Trees"
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white focus:outline-none focus:border-wizard-purple-glow"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono uppercase text-white/70 mb-1">
+                    Lineage / Genetics / Specs (Optional)
                   </label>
                   <input
                     type="text"
                     value={formData.lineage}
                     onChange={(e) => setFormData({ ...formData, lineage: e.target.value })}
-                    placeholder="e.g. Rainbow Sherbet #11 x Pink Guava"
+                    placeholder="e.g. 30,000 Puffs // Dual Mesh Screen"
                     className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white focus:outline-none focus:border-wizard-purple-glow"
                   />
                 </div>
@@ -453,6 +565,7 @@ export default function AdminProductsPage() {
                       <>
                         <option value="">Flower</option>
                         <option value="">Seeds</option>
+                        <option value="">Vapes</option>
                         <option value="">Other</option>
                       </>
                     ) : (
@@ -530,7 +643,7 @@ export default function AdminProductsPage() {
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Terpene notes, lineage, and product specifics..."
+                  placeholder="Terpene notes, device hardware specs, puffs..."
                   className="w-full rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-sm text-white focus:outline-none focus:border-wizard-purple-glow"
                 />
               </div>
@@ -539,7 +652,7 @@ export default function AdminProductsPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-mono uppercase text-white/70">
-                    Product Photos (1:1 Cropped & Auto-Compressed)
+                    Product Hero Photos (1:1 Cropped & Auto-Compressed)
                   </label>
                   <label className="cursor-pointer text-xs font-mono text-wizard-purple-glow hover:underline flex items-center gap-1 font-bold">
                     <Upload className="w-3.5 h-3.5" />
@@ -574,6 +687,190 @@ export default function AdminProductsPage() {
                     ))
                   )}
                 </div>
+              </div>
+
+              {/* Flavour Manager (For Vapes / Multi-Flavour Hardware) */}
+              <div className="pt-4 border-t border-white/10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <div>
+                    <label className="text-xs font-mono uppercase text-white font-bold flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Configured Flavours ({formData.flavors.length})</span>
+                    </label>
+                    <p className="text-[11px] font-mono text-white/50 mt-0.5">
+                      Each flavour has its own packaging photo, dual taste color dots, and stock toggle.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddFlavor}
+                    className="self-start sm:self-auto rounded-lg bg-sky-500/20 border border-sky-500/40 px-3 py-1.5 font-mono text-xs text-sky-200 font-bold uppercase tracking-wider hover:bg-sky-500 hover:text-white transition flex items-center gap-1.5"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Flavour</span>
+                  </button>
+                </div>
+
+                {formData.flavors.length === 0 ? (
+                  <div className="p-4 rounded-xl border border-dashed border-white/10 bg-white/[0.02] text-center font-mono text-xs text-white/40">
+                    No flavours configured yet. Click &quot;Add Flavour&quot; to define flavour options with custom photos and taste color dots.
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    {formData.flavors.map((flv, idx) => (
+                      <div
+                        key={flv.id || idx}
+                        className="rounded-xl border border-white/10 bg-black/40 p-3 sm:p-4 space-y-3"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                          {/* Flavour Photo Thumbnail & Upload Button */}
+                          <div className="relative w-14 h-14 rounded-lg overflow-hidden border border-white/20 bg-black flex-shrink-0 group">
+                            <Image
+                              src={flv.image || '/images/wizard_trees_photo.png'}
+                              alt={flv.name}
+                              fill
+                              className="object-cover"
+                            />
+                            <label className="absolute inset-0 bg-black/80 text-white flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer text-[9px] font-mono font-bold text-center p-1">
+                              <span>Change Photo</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleFlavorFileSelect(idx, e)}
+                                className="hidden"
+                              />
+                            </label>
+                          </div>
+
+                          {/* Flavour Name Input */}
+                          <div className="flex-1">
+                            <label className="block text-[10px] font-mono uppercase text-white/50 mb-1">
+                              Flavour Name
+                            </label>
+                            <input
+                              type="text"
+                              value={flv.name}
+                              onChange={(e) => handleUpdateFlavor(idx, { name: e.target.value })}
+                              placeholder="e.g. Coffee, Blue Razz Ice"
+                              className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white font-bold focus:outline-none focus:border-sky-500"
+                            />
+                          </div>
+
+                          {/* Price Override (Optional) */}
+                          <div className="w-24">
+                            <label className="block text-[10px] font-mono uppercase text-white/50 mb-1">
+                              Price ($)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={flv.price ?? ''}
+                              onChange={(e) =>
+                                handleUpdateFlavor(idx, {
+                                  price: e.target.value ? parseFloat(e.target.value) : undefined,
+                                })
+                              }
+                              placeholder={`${formData.price}`}
+                              className="w-full rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-sky-500 font-mono"
+                            />
+                          </div>
+
+                          {/* Stock Toggle */}
+                          <div className="flex-shrink-0">
+                            <label className="block text-[10px] font-mono uppercase text-white/50 mb-1">
+                              Stock
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateFlavor(idx, { inStock: flv.inStock === false ? true : false })
+                              }
+                              className={`px-3 py-1.5 rounded-lg font-mono text-xs font-bold uppercase tracking-wider border transition ${flv.inStock !== false
+                                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+                                  : 'bg-red-950/60 border-red-500/40 text-red-300'
+                                }`}
+                            >
+                              {flv.inStock !== false ? 'In Stock' : 'Sold Out'}
+                            </button>
+                          </div>
+
+                          {/* Delete Flavour Button */}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveFlavor(idx)}
+                            className="p-2 text-white/40 hover:text-red-400 hover:bg-red-950/30 rounded-lg transition self-end sm:self-center"
+                            title="Delete Flavour"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Taste Swatch Colors */}
+                        <div className="pt-2 border-t border-white/5 flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-mono uppercase text-white/50 flex items-center gap-1">
+                            <Palette className="w-3 h-3 text-white/40" />
+                            <span>Taste Dot Swatch:</span>
+                          </span>
+
+                          {/* Swatch Preview */}
+                          <span
+                            className="w-4 h-4 rounded-full ring-1 ring-white/30 flex-shrink-0"
+                            style={{
+                              background: flv.secondaryColor
+                                ? `linear-gradient(135deg, ${flv.color || '#fff'} 50%, ${flv.secondaryColor} 50%)`
+                                : (flv.color || '#fff'),
+                            }}
+                            title="Swatch Preview"
+                          />
+
+                          {/* Color Inputs */}
+                          <div className="flex items-center gap-1">
+                            <input
+                              type="color"
+                              value={flv.color || '#795548'}
+                              onChange={(e) => handleUpdateFlavor(idx, { color: e.target.value })}
+                              className="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0"
+                              title="Primary Taste Color"
+                            />
+                            <input
+                              type="color"
+                              value={flv.secondaryColor || '#D7CCC8'}
+                              onChange={(e) => handleUpdateFlavor(idx, { secondaryColor: e.target.value })}
+                              className="w-5 h-5 rounded cursor-pointer bg-transparent border-0 p-0"
+                              title="Secondary Taste Color"
+                            />
+                          </div>
+
+                          {/* Quick Preset Buttons */}
+                          <div className="flex flex-wrap gap-1 items-center ml-auto">
+                            {FLAVOR_COLOR_PRESETS.slice(0, 6).map((preset) => (
+                              <button
+                                key={preset.name}
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateFlavor(idx, {
+                                    color: preset.primary,
+                                    secondaryColor: preset.secondary,
+                                  })
+                                }
+                                className="px-1.5 py-0.5 rounded text-[9px] font-mono border border-white/10 hover:border-white/30 text-white/60 hover:text-white transition flex items-center gap-1"
+                              >
+                                <span
+                                  className="w-2 h-2 rounded-full inline-block"
+                                  style={{
+                                    background: `linear-gradient(135deg, ${preset.primary} 50%, ${preset.secondary} 50%)`,
+                                  }}
+                                />
+                                <span>{preset.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Action buttons */}
@@ -640,6 +937,11 @@ export default function AdminProductsPage() {
                     <h2 className="font-display font-black text-2xl text-white">
                       {selectedProduct.name}
                     </h2>
+                    {selectedProduct.brand && (
+                      <div className="inline-flex items-center gap-1.5 rounded-lg border border-sky-500/30 bg-sky-950/30 px-2.5 py-1 text-xs font-mono text-sky-200">
+                        <span>Brand: <strong className="text-white">{selectedProduct.brand}</strong></span>
+                      </div>
+                    )}
                     {selectedProduct.lineage && (
                       <div className="inline-flex items-center gap-1.5 rounded-lg border border-purple-500/30 bg-purple-950/30 px-2.5 py-1 text-xs font-mono text-purple-200">
                         <Dna className="w-3.5 h-3.5 text-wizard-purple-glow" />
@@ -745,6 +1047,50 @@ export default function AdminProductsPage() {
                     <span className="text-[10px] text-white/40">Customer visibility</span>
                   </div>
                 </div>
+
+                {/* Flavours & Swatches Drawer Section */}
+                {selectedProduct.flavors && selectedProduct.flavors.length > 0 && (
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3 font-mono text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold uppercase text-white/70 flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-sky-400" />
+                        <span>Flavours ({selectedProduct.flavors.length})</span>
+                      </span>
+                      <span className="text-[10px] text-white/40">
+                        {selectedProduct.flavors.filter((f) => f.inStock !== false).length} in stock
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-1">
+                      {selectedProduct.flavors.map((flv, i) => (
+                        <div
+                          key={flv.id || i}
+                          className="flex items-center justify-between p-2 rounded-lg bg-black/40 border border-white/5"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span
+                              className="w-3.5 h-3.5 rounded-full flex-shrink-0"
+                              style={{
+                                background: flv.secondaryColor
+                                  ? `linear-gradient(135deg, ${flv.color || '#fff'} 50%, ${flv.secondaryColor} 50%)`
+                                  : (flv.color || '#fff'),
+                              }}
+                            />
+                            <span className="text-white font-medium truncate">{flv.name}</span>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${flv.inStock !== false
+                                ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-500/30'
+                                : 'bg-red-950/60 text-red-400 border border-red-500/30'
+                              }`}
+                          >
+                            {flv.inStock !== false ? 'In Stock' : 'Sold Out'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Description */}
                 <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 font-mono text-xs space-y-1.5">

@@ -190,6 +190,12 @@ export function Navbar() {
                   Catalog
                 </Link>
                 <Link
+                  href="/collection/vapes"
+                  className="hover:text-purple-200 transition-colors duration-150"
+                >
+                  Vapes
+                </Link>
+                <Link
                   href="/about"
                   className="hover:text-purple-200 transition-colors duration-150"
                 >
@@ -379,6 +385,13 @@ export function Navbar() {
                   className="hover:text-purple-200 transition"
                 >
                   Catalog
+                </Link>
+                <Link
+                  href="/collection/vapes"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="hover:text-purple-200 transition"
+                >
+                  Vapes
                 </Link>
                 <Link
                   href="/about"
