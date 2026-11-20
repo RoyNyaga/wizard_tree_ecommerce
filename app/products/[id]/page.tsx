@@ -78,9 +78,11 @@ export default function ProductShowPage() {
   });
 
   // Find product by id or slug
+  // Vape products are excluded from mock fallback — they must come from the DB only
   const { currentProduct, allProductsList } = useMemo(() => {
     const liveItems: Product[] = dbProducts.map(mapDbProductToProduct);
-    const combined = [...liveItems, ...PRODUCTS_DATA];
+    const mockFallback = PRODUCTS_DATA.filter((p) => p.category !== 'vapes');
+    const combined = [...liveItems, ...mockFallback];
 
     const found = combined.find(
       (p) =>
@@ -294,8 +296,8 @@ export default function ProductShowPage() {
                         key={flv.id || idx}
                         onClick={() => setSelectedFlavorIndex(idx)}
                         className={`group/thumb relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-200 bg-black/50 ${isSelected
-                            ? 'border-white scale-105 shadow-xl ring-2 ring-white/20 z-10'
-                            : 'border-white/10 opacity-70 hover:opacity-100 hover:border-white/40'
+                          ? 'border-white scale-105 shadow-xl ring-2 ring-white/20 z-10'
+                          : 'border-white/10 opacity-70 hover:opacity-100 hover:border-white/40'
                           }`}
                       >
                         <Image
@@ -359,8 +361,8 @@ export default function ProductShowPage() {
                           onClick={() => setSelectedFlavorIndex(idx)}
                           disabled={!isAvailable}
                           className={`flex items-center justify-between gap-2.5 px-3.5 py-3 rounded-2xl border transition-all text-left ${isSelected
-                              ? 'border-sky-500 bg-sky-500/10 text-white font-semibold ring-1 ring-sky-500/40 shadow-md'
-                              : 'border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.08] hover:border-white/20'
+                            ? 'border-sky-500 bg-sky-500/10 text-white font-semibold ring-1 ring-sky-500/40 shadow-md'
+                            : 'border-white/10 bg-white/[0.03] text-white/80 hover:bg-white/[0.08] hover:border-white/20'
                             } ${!isAvailable ? 'opacity-40 cursor-not-allowed' : ''}`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
