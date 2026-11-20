@@ -862,9 +862,9 @@ export default function AdminProductsPage() {
                             />
                           </div>
 
-                          {/* Quick Preset Buttons */}
-                          <div className="flex flex-wrap gap-1 items-center ml-auto">
-                            {FLAVOR_COLOR_PRESETS.slice(0, 6).map((preset) => (
+                          {/* Quick Preset Buttons — all presets, scrollable row */}
+                          <div className="flex flex-wrap gap-1 items-center mt-1 w-full">
+                            {FLAVOR_COLOR_PRESETS.map((preset) => (
                               <button
                                 key={preset.name}
                                 type="button"
@@ -872,12 +872,13 @@ export default function AdminProductsPage() {
                                   handleUpdateFlavor(idx, {
                                     color: preset.primary,
                                     secondaryColor: preset.secondary,
+                                    name: formData.flavors[idx]?.name || preset.name,
                                   })
                                 }
                                 className="px-1.5 py-0.5 rounded text-[9px] font-mono border border-white/10 hover:border-white/30 text-white/60 hover:text-white transition flex items-center gap-1"
                               >
                                 <span
-                                  className="w-2 h-2 rounded-full inline-block"
+                                  className="w-2 h-2 rounded-full inline-block flex-shrink-0"
                                   style={{
                                     background: `linear-gradient(135deg, ${preset.primary} 50%, ${preset.secondary} 50%)`,
                                   }}
