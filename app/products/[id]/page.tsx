@@ -262,16 +262,6 @@ export default function ProductShowPage() {
                   </span>
                 </div>
 
-                {/* Device puffs badge in bottom-right (matching reference) */}
-                <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end">
-                  <div className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] flex items-baseline gap-1">
-                    <span>30</span>
-                    <span className="text-sm font-bold tracking-normal border border-white/40 px-1 py-0.5 rounded leading-none">
-                      PUFFS
-                    </span>
-                  </div>
-                </div>
-
                 {/* Central Device Photo */}
                 <div className="relative w-full h-full max-w-[480px]">
                   <Image

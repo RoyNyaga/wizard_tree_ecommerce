@@ -14,7 +14,7 @@ export function VapesSection() {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="relative w-full h-full scale-[1.65] sm:scale-[1.95] md:scale-[2.2] lg:scale-[2.35] transition-transform duration-500">
             <Image
-              src="/images/home/vape_home.png"
+              src="/images/home/vape_home_page_2.png"
               alt="Wizard Trees Vapes - Premium Branded Hardware & Flavours"
               fill
               priority
